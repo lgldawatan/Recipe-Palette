@@ -7,13 +7,14 @@ import "./Home.css";
 import "./index.css";
 import Logo2 from "./Assets/api.png";
 import Logo1 from "./Assets/logo.png";
+import { saveFavorite, removeFavorite } from "./favoritesApi";
 
 export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
   /* ================================
      UI STATE / NAV HELPERS
      ================================ */
-  const [profileOpen, setProfileOpen] = useState(false); // profile dropdown
-  const [menuOpen, setMenuOpen] = useState(false);       // mobile drawer
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginWarn, setShowLoginWarn] = useState(false);
 
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
      DATA STATE
      ================================ */
   const [meals, setMeals] = useState([]);
-  const [status, setStatus] = useState("idle"); // "idle" | "loading" | "success" | "error"
+  const [status, setStatus] = useState("idle");
   const [detailMeal, setDetailMeal] = useState(null);
 
   const openMeal = (m) => {
@@ -48,6 +49,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
   };
 
   const dotJoin = (...xs) => xs.filter(Boolean).join(" • ");
+
 
   function ingredientSummary(meal, take = 8) {
     const items = [];
@@ -78,12 +80,12 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
 
   function stepsFromText(txt = "") {
     return txt
-      .split(/\r?\n+/)// split by new lines
+      .split(/\r?\n+/)
       .map(s =>
-        // strip leading "STEP 3", "3.", "3)", "3 -", "3:" (case-insensitive)
+
         s.replace(/^(?:STEP\s*)?\d+(?:[.)\-:])?\s*/i, "").trim()
       )
-      // drop empty lines and number-only lines like "1", "2", "STEP 4"
+
       .filter(s => s && !/^(?:STEP\s*)?\d+$/i.test(s));
   }
 
@@ -147,21 +149,39 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
   /* ================================
      AUTH HELPERS
      ================================ */
-  const isAuthed = Boolean(user?.uid);// checks if signed in
-  const avatar = user?.photoURL || null; // user’s Google/Email avatar
+  const isAuthed = Boolean(user?.uid);
+  const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
 
-  const toggleFavorite = (meal) => {
+  const isFav = (id) => savedRecipes?.some((x) => x.idMeal === id);
+
+  const toggleFavorite = async (meal) => {
     if (!isAuthed) {
       setShowLoginWarn(true);
       return;
     }
-    setSavedRecipes((prev) => {
-      const exists = prev.some((x) => x.idMeal === meal.idMeal);
-      return exists ? prev.filter((x) => x.idMeal !== meal.idMeal) : [meal, ...prev];
-    });
+
+    const exists = isFav(meal.idMeal);
+
+
+    setSavedRecipes((prev) =>
+      exists
+        ? prev.filter((x) => x.idMeal !== meal.idMeal)
+        : [...prev, meal]
+    );
+
+
+    try {
+      if (exists) {
+        await removeFavorite(user, meal.idMeal);
+      } else {
+        await saveFavorite(user, meal);
+      }
+    } catch (err) {
+      console.error("Favorite sync failed", err);
+    }
   };
-  const isFav = (id) => savedRecipes?.some((x) => x.idMeal === id);
+
 
   const handleFavoritesNav = (e) => {
     if (!isAuthed) {
@@ -176,7 +196,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
   return (
     <>
       {/* ======================================================
-          HEADER (brand + primary nav + profile dropdown)
+          HEADER 
           ====================================================== */}
       <header className="rp-header">
         <div className="rp-shell">

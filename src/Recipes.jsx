@@ -7,6 +7,7 @@ import "./Recipes.css";
 import "./index.css";
 import Logo1 from "./Assets/logo.png";
 import Logo2 from "./Assets/api.png";
+import { saveFavorite, removeFavorite } from "./favoritesApi";
 
 export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   // ==============================
@@ -19,7 +20,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   // ==============================
   // UI state
   // ==============================
-  const [open, setOpen] = useState(false);           // profile dropdown open?
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const scrollLockY = useRef(0);
 
@@ -32,21 +33,21 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   // ==============================
   // Data / Control state
   // ==============================
-  const [crumbs, setCrumbs] = useState(LABEL_ALL);   // "All Recipes", "Search: x", or filter summary
-  const [full, setFull] = useState([]);              // full current dataset (search result base)
-  const [all, setAll] = useState([]);                // filtered + paginated source array
-  const [page, setPage] = useState(1);               // current page number
-  const [q, setQ] = useState("");                    // search query string
-  const [status, setStatus] = useState("idle");      // "idle" | "loading" | "success" | "error"
-  const [errMsg, setErrMsg] = useState("");          // error text when status === "error"
+  const [crumbs, setCrumbs] = useState(LABEL_ALL);
+  const [full, setFull] = useState([]);
+  const [all, setAll] = useState([]);
+  const [page, setPage] = useState(1);
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState("idle");
+  const [errMsg, setErrMsg] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Filter modal controls and options
   const [isOpen, setIsOpen] = useState(false);
-  const [categories, setCategories] = useState([]);  // list of category strings
-  const [areas, setAreas] = useState([]);            // list of cuisine/area strings
-  const [selCats, setSelCats] = useState(new Set()); // selected categories
-  const [selAreas, setSelAreas] = useState(new Set());// selected areas
+  const [categories, setCategories] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [selCats, setSelCats] = useState(new Set());
+  const [selAreas, setSelAreas] = useState(new Set());
 
   // details modal
   const [detailMeal, setDetailMeal] = useState(null);
@@ -55,12 +56,12 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
   function stepsFromText(txt = "") {
     return txt
-      .split(/\r?\n+/) // split by new lines
+      .split(/\r?\n+/)
       .map(s =>
-        // strip leading "STEP 3", "3.", "3)", "3 -", "3:" (case-insensitive)
+
         s.replace(/^(?:STEP\s*)?\d+(?:[.)\-:])?\s*/i, "").trim()
       )
-      // drop empty lines and number-only lines like "1", "2", "STEP 4"
+
       .filter(s => s && !/^(?:STEP\s*)?\d+$/i.test(s));
   }
 
@@ -83,9 +84,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     return out;
   };
 
-
-
-  // Login-required prompt modal
   const [showLoginWarn, setShowLoginWarn] = useState(false);
 
   // ==============================
@@ -95,24 +93,22 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
 
-  // ==============================
-  // Small utilities
-  // ==============================
-  const j = useCallback(async (u) => (await fetch(u)).json(), []);      // fetch -> json
-  const dotJoin = (...xs) => xs.filter(Boolean).join(" • ");            // join with bullets
-  const ingredientSummary = (m, take = 8) => {                          // compose "measure ingredient" list
+  const j = useCallback(async (u) => (await fetch(u)).json(), []);
+
+  const dotJoin = (...xs) => xs.filter(Boolean).join(" • ");
+
+  const ingredientSummary = (m, take = 8) => {
     const items = [];
     for (let i = 1; i <= 20; i++) {
       const ing = m[`strIngredient${i}`];
       const mea = m[`strMeasure${i}`];
-      if (ing && ing.trim()) items.push(`${(mea || "").trim()} ${ing.trim()}`.trim());
+      if (ing && ing.trim()) {
+        items.push(`${ing.trim()} ${((mea || "").trim())}`.trim());
+      }
     }
     return items.slice(0, take).join(", ");
   };
 
-  // ==============================
-  // Responsive UI: keep crumb bar underline sized to text
-  // ==============================
   function updateCrumbsWidth() {
     if (barRef.current && crumbsRef.current) {
       barRef.current.style.setProperty("--crumbs-w", `${crumbsRef.current.offsetWidth}px`);
@@ -132,7 +128,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
       document.body.style.top = "";
       window.scrollTo(0, scrollLockY.current);
     }
-    // cleanup if component unmounts while locked
+
     return () => {
       document.body.classList.remove("rp-noscroll");
       document.body.style.top = "";
@@ -141,40 +137,65 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
   // ==============================
   // Data loading
-  // - Effect: initial load + fetch lists for categories & areas
   // ==============================
   const loadAll = useCallback(async () => {
     setStatus("loading");
     setErrMsg("");
+    setFull([]);
+    setAll([]);
+    setPage(1);
+    setCrumbs(LABEL_ALL);
+
+    const letters = "abcdefghijklmnopqrstuvwxyz".split("");
+    const seen = new Set();
+    let accumulated = [];
+    let hasShown = false;
+
     try {
-      const letters = "abcdefghijklmnopqrstuvwxyz".split("");
-      const responses = await Promise.all(letters.map((l) => j(`${API}/search.php?f=${l}`)));
-      // merge all results, drop nulls
-      let results = [];
-      for (const r of responses) if (r?.meals) results.push(...r.meals);
+      await Promise.all(
+        letters.map(async (l) => {
+          const res = await j(`${API}/search.php?f=${l}`);
+          const meals = res?.meals || [];
+          if (!meals.length) return;
 
-      // de-duplicate by idMeal and sort by meal name
-      const seen = new Set();
-      const unique = results
-        .filter((m) => {
-          if (!m?.idMeal || seen.has(m.idMeal)) return false;
-          seen.add(m.idMeal);
-          return true;
+          const fresh = [];
+          for (const m of meals) {
+            if (!m?.idMeal) continue;
+            if (seen.has(m.idMeal)) continue;
+            seen.add(m.idMeal);
+            fresh.push(m);
+          }
+
+          if (!fresh.length) return;
+
+          accumulated = [...accumulated, ...fresh].sort((a, b) =>
+            a.strMeal.localeCompare(b.strMeal)
+          );
+
+          setFull(accumulated);
+          setAll(accumulated);
+
+          if (!hasShown) {
+            hasShown = true;
+            setStatus("success");
+          }
         })
-        .sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+      );
 
-      // set data sources
-      setFull(unique);
-      setAll(unique);
-      setCrumbs(LABEL_ALL);
-      setPage(1);
-      setStatus("success");
-    } catch {
+      if (!hasShown) {
+        setStatus("success");
+        setFull([]);
+        setAll([]);
+      }
+    } catch (err) {
+      console.error(err);
       setErrMsg("Failed to load recipes.");
-      setFull([]); setAll([]);
+      setFull([]);
+      setAll([]);
       setStatus("error");
     }
-  }, [API, LABEL_ALL, j]);
+  }, [API, j, LABEL_ALL]);
+
 
   useEffect(() => {
     (async () => {
@@ -190,15 +211,11 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         setAreas((ars.meals || []).map(x => x.strArea).sort());
       } catch { }
     })();
-  }, [loadAll, j]); // ⬅ add j here
+  }, [loadAll, j]);
 
 
   // ==============================
   // Searching helpers
-  // - mergeMeals: unify results by id
-  // - searchByName: /search.php?s=
-  // - searchByIngredient: /filter.php?i= -> hydrate with /lookup.php?i=
-  // - runSearch: performs both and merges
   // ==============================
   const mergeMeals = (...lists) => {
     const map = new Map();
@@ -235,8 +252,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
   // ==============================
   // Filtering helpers
-  // - Build ID sets from category/area filters, intersect with current base
-  // - Hydrate final details, then sort and render
   // ==============================
   const idsFromMeals = (meals) => (meals || []).map((m) => m.idMeal);
   const idsByCategories = async (set) => {
@@ -267,7 +282,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   // Apply selected filters
   async function applyFilters(selCats, selAreas) {
     if (selCats.size === 0 && selAreas.size === 0) {
-      // nothing selected → show everything in current base
+
       setAll(full.slice()); setPage(1);
       setCrumbs(q.trim() ? `Search: ${q.trim()}` : LABEL_ALL);
       setStatus("success");
@@ -278,11 +293,11 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
       const [byC, byA] = await Promise.all([idsByCategories(selCats), idsByAreas(selAreas)]);
       let ids = intersectSets(byC, byA);
 
-      // Intersect with current base (in case user filtered after search)
+
       const baseIds = new Set(full.map((m) => m.idMeal));
       ids = intersectSets(ids, baseIds);
 
-      // If no matches, show empty state but keep crumb summary
+
       if (!ids || !ids.size) {
         setAll([]); setPage(1);
         const catTxt = selCats.size ? Array.from(selCats).join(", ") : "Any";
@@ -315,21 +330,36 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   const start = (page - 1) * PER_PAGE;
   const slice = all.slice(start, start + PER_PAGE);
 
-  // ==============================
-  // Favorites: requires auth
-  // - Toggle adds/removes from savedRecipes
-  // - If unauthenticated, show login modal
-  // ==============================
-  const toggleFavorite = (meal) => {
-    if (!isAuthed) { setShowLoginWarn(true); return; }
-    setSavedRecipes((prev) => {
-      const exists = prev.some((x) => x.idMeal === meal.idMeal);
-      return exists ? prev.filter((x) => x.idMeal !== meal.idMeal) : [meal, ...prev];
-    });
-  };
+
   const isFav = (id) => savedRecipes?.some((x) => x.idMeal === id);
 
-  // Block Favorites nav if not signed in
+  const toggleFavorite = async (meal) => {
+    if (!isAuthed) {
+      setShowLoginWarn(true);
+      return;
+    }
+
+    const exists = isFav(meal.idMeal);
+
+    setSavedRecipes((prev) =>
+      exists
+        ? prev.filter((x) => x.idMeal !== meal.idMeal)
+        : [...prev, meal]
+    );
+
+
+    try {
+      if (exists) {
+        await removeFavorite(user, meal.idMeal);
+      } else {
+        await saveFavorite(user, meal);
+      }
+    } catch (err) {
+      console.error("Failed to update favorite:", err);
+    }
+  };
+
+
   const handleFavoritesNav = (e) => {
     if (!isAuthed) {
       e.preventDefault();
@@ -342,7 +372,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   // ==============================
   return (
     <>
-      {/* ================= Header (brand + primary nav + profile) ================= */}
+      {/* ================= Header================= */}
       <header className="rp-header">
         <div className="rp-shell">
           {/* Brand / Logo */}
@@ -448,7 +478,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
       {/* ================= Main content ================= */}
       <main className="page recipes-page">
-        {/* ---------- HERO: title + search + filter trigger ---------- */}
         <section className="hero-recipes">
           <div className="hero-wrap">
             <h1 className="hero-title">AUTHENTIC FLAVORS AND<br />CUISINES AT YOUR FINGERTIPS</h1>
@@ -457,7 +486,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
               good food and explore our collection of smart recipes that make every day special.
             </p>
 
-            {/* Search form (Enter submit) + Filter button (opens modal) */}
             <form className="hero-search" onSubmit={(e) => { e.preventDefault(); runSearch(q); }}>
               <div className="search-box">
                 <i className="bi bi-search" aria-hidden="true"></i>
@@ -469,7 +497,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
                   onChange={(e) => {
                     const v = e.target.value;
                     setQ(v);
-                    // If cleared, reload full set
+
                     if (v.trim() === "") runSearch("");
                   }}
                 />
@@ -487,12 +515,11 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
           </div>
         </section>
 
-        {/* ---------- LIST: crumbs + reload + cards + empty/error states + pager ---------- */}
         <section className="r-list">
-          {/* Crumbs bar (shows current context) */}
+
           <div className="r-bar" ref={barRef}>
             <div className="r-crumbs" ref={crumbsRef}>{crumbs}</div>
-            {/* Reload resets filters and query context */}
+
             <button
               className="reload-btn"
               aria-label="Reload recipes"
@@ -505,12 +532,12 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             </button>
           </div>
 
-          {/* Grid wrapper: shows loading, error, empty, or cards */}
+
           <div className={`r-grid ${status === "success" && slice.length === 0 ? "is-empty" : ""}`}>
-            {/* Loading text */}
+
             {status === "loading" && <p style={{ color: "#777", textAlign: "center", width: "100%" }}>Loading recipes…</p>}
 
-            {/* Error state */}
+
             {status === "error" && (
               <div className="r-empty">
                 <i className="bi bi-emoji-frown r-empty__icon" aria-hidden="true"></i>
@@ -585,7 +612,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             className="rp-modal is-open"
             aria-hidden="false"
             onClick={(e) => {
-              // click scrim to close
+
               if (e.target.classList.contains("rp-modal__scrim")) {
                 setIsOpen(false);
                 document.body.classList.remove("rp-noscroll");
@@ -646,7 +673,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
                 </div>
               </div>
 
-              {/* Modal footer: clear/cancel/apply */}
+
               <div className="rp-modal__foot">
                 <button
                   className={`btn-ghost ${selCats.size + selAreas.size > 0 ? "enabled" : ""}`}
@@ -700,7 +727,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         </div>
       </footer>
 
-      {/* ================= Login required modal (blocks favorites & /favorites) ================= */}
+      {/* ================= Login required modal================= */}
       {showLoginWarn && (
         <div
           className="rp-modal is-open login-modal"
