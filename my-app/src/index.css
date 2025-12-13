@@ -1,0 +1,1307 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+body.rp-noscroll {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Navbar */
+.rp-header {
+  background: #cb7615;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* White pill */
+.rp-shell {
+  width: 100%;
+  max-width: calc(var(--container) + 16rem);
+  height: 60px;
+  background: var(--paper);
+  border-radius: var(--pill-radius);
+  padding-inline: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left brand */
+.rp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.rp-logo-stack {
+  height: 30px;
+}
+
+.rp-wordmark {
+  font-family: "Fredoka One", cursive;
+  font-size: 19px;
+  line-height: 1.1;
+  color: #0f2a3f;
+}
+
+/* Right side (nav + profile) */
+.rp-right {
+  display: flex;
+  align-items: center;
+  gap: 70px;
+}
+
+/* Nav links */
+.rp-nav {
+  display: flex;
+  gap: 70px;
+}
+
+.rp-link {
+  font-size: 16px;
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+}
+
+.rp-link--active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Profile icon */
+.rp-profile {
+  width: 45px !important;
+  height: 45px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+@media (max-width:1024px) {
+  .rp-nav {
+    gap: 20px
+  }
+}
+
+@media (max-width:768px) {
+  .rp-shell {
+    padding-inline: 12px;
+  }
+
+  .rp-nav {
+    gap: 16px
+  }
+
+  .rp-wordmark {
+    font-size: 18px
+  }
+}
+
+body.rp-noscroll {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+.rp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+}
+
+.rp-modal__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(2px);
+}
+
+.login-modal .rp-modal__panel {
+  width: min(350px, 94vw);
+  background: white;
+  border-radius: 27px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+  overflow: hidden;
+  padding: 27px 0 12px 0;
+}
+
+.login-modal__icon {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 6px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+}
+
+.login-modal__icon i {
+  font-size: 60px;
+  line-height: 1;
+  color: #111;
+}
+
+.login-modal .rp-modal__head {
+  padding: 4px 26px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-bottom: none;
+}
+
+.login-modal .rp-modal__head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f1f1f;
+  letter-spacing: .1px;
+}
+
+.login-modal .rp-modal__body {
+  padding: 10px 26px 6px;
+  text-align: center;
+  color: #2b2b2b;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.login-modal .rp-modal__body p {
+  margin: 0;
+}
+
+.login-modal .rp-modal__foot {
+  padding: 18px 18px 22px;
+  border-top: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-modal .rp-modal__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.login-modal .btn-plain {
+  padding: 13px 33px;
+  border-radius: 17px;
+  border: 1.5px solid #222;
+  background: #fff;
+  color: #111;
+  font-weight: 500;
+  transition: ease-in-out .5s;
+  font-size: 13px;
+}
+
+.login-modal .btn-accent {
+  padding: 13px 35px !important;
+  border-radius: 22px;
+  border: 0;
+  background: #DF861E;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: none;
+  transition: ease-in-out .5s;
+  transform: none !important;
+  font-size: 13px;
+}
+
+.login-modal .btn-plain:hover {
+  background-color: #e2e2e2;
+}
+
+.login-modal .btn-accent:hover {
+  background-color: #ff9b0f !important;
+}
+
+@media (max-width: 480px) {
+  .login-modal .rp-modal__panel {
+    border-radius: 24px;
+  }
+
+  .login-modal .rp-modal__head h3 {
+    font-size: 19px;
+  }
+
+  .login-modal .rp-modal__body {
+    font-size: 15px;
+  }
+}
+
+/* Profile avatar*/
+.rp-profile-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.rp-profile {
+  width: 40px !important;
+  height: 40px !important;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  border-radius: 999px !important;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.rp-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Dropdown: centered below the profile*/
+.rp-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.104);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.rp-dropdown-item {
+  width: 100%;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  font-size: 15px;
+  cursor: pointer;
+  transition: ease-in-out .5s;
+
+}
+
+.rp-dropdown-item:hover {
+  background: rgb(241, 241, 241);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.rp-profile {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.rp-profile i {
+  font-size: 38px;
+  line-height: 1;
+  color: #0f2a3f;
+}
+
+
+/* ===== Footer===== */
+.site-footer {
+  margin-top: 60px;
+  font-family: Poppins, sans-serif;
+  text-align: center;
+}
+
+/* Orange band */
+.footer-top {
+  background: white;
+  color: #1f1f1f;
+  padding: 24px 16px 26px;
+}
+
+.footer-tagline {
+  margin: 0 0 25px;
+  font-size: 16px !important;
+  line-height: 1.6;
+}
+
+/* Two logos centered */
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.footer-logos img {
+  max-height: 42px;
+  width: auto;
+  object-fit: contain;
+  filter: none;
+}
+/* Bottom grey strip */
+.footer-bottom {
+  background: #f7f3ef;
+  padding: 1px 20px !important;
+  color: #2a2a2a;
+  font-size: 13px;
+}
+
+@media (max-width:600px) {
+  .footer-logos {
+    gap: 18px
+  }
+
+  .footer-logos img {
+    max-height: 36px
+  }
+}
+
+.page,
+.about-main,
+.fav-wrap .page,
+.recipes-page {
+  width: 90% !important;  
+  max-width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rp-shell {
+  width: 93% !important;     /* same indent as page */
+  max-width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-inline: 50px !important; /* balanced inner spacing */
+  overflow: visible !important;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+body.rp-noscroll {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Navbar */
+.rp-header {
+  background: #cb7615;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* White pill */
+.rp-shell {
+  width: 100%;
+  max-width: calc(var(--container) + 16rem);
+  height: 60px;
+  background: var(--paper);
+  border-radius: var(--pill-radius);
+  padding-inline: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left brand */
+.rp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.rp-logo-stack {
+  height: 30px;
+}
+
+.rp-wordmark {
+  font-family: "Fredoka One", cursive;
+  font-size: 19px;
+  line-height: 1.1;
+  color: #0f2a3f;
+}
+
+/* Right side (nav + profile) */
+.rp-right {
+  display: flex;
+  align-items: center;
+  gap: 70px;
+}
+
+/* Nav links */
+.rp-nav {
+  display: flex;
+  gap: 70px;
+}
+
+.rp-link {
+  font-size: 16px;
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+}
+
+.rp-link--active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Profile icon */
+.rp-profile {
+  width: 45px !important;
+  height: 45px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+@media (max-width:1024px) {
+  .rp-nav {
+    gap: 20px
+  }
+}
+
+@media (max-width:768px) {
+  .rp-shell {
+    padding-inline: 12px;
+  }
+
+  .rp-nav {
+    gap: 16px
+  }
+
+  .rp-wordmark {
+    font-size: 18px
+  }
+}
+
+body.rp-noscroll {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+.rp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+}
+
+.rp-modal__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(2px);
+}
+
+.login-modal .rp-modal__panel {
+  width: min(350px, 94vw);
+  background: white;
+  border-radius: 27px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+  overflow: hidden;
+  padding: 27px 0 12px 0;
+}
+
+.login-modal__icon {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 6px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+}
+
+.login-modal__icon i {
+  font-size: 60px;
+  line-height: 1;
+  color: #111;
+}
+
+.login-modal .rp-modal__head {
+  padding: 4px 26px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-bottom: none;
+}
+
+.login-modal .rp-modal__head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f1f1f;
+  letter-spacing: .1px;
+}
+
+.login-modal .rp-modal__body {
+  padding: 10px 26px 6px;
+  text-align: center;
+  color: #2b2b2b;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.login-modal .rp-modal__body p {
+  margin: 0;
+}
+
+.login-modal .rp-modal__foot {
+  padding: 18px 18px 22px;
+  border-top: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-modal .rp-modal__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.login-modal .btn-plain {
+  padding: 13px 33px;
+  border-radius: 17px;
+  border: 1.5px solid #222;
+  background: #fff;
+  color: #111;
+  font-weight: 500;
+  transition: ease-in-out .5s;
+  font-size: 13px;
+}
+
+.login-modal .btn-accent {
+  padding: 13px 35px !important;
+  border-radius: 22px;
+  border: 0;
+  background: #DF861E;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: none;
+  transition: ease-in-out .5s;
+  transform: none !important;
+  font-size: 13px;
+}
+
+.login-modal .btn-plain:hover {
+  background-color: #e2e2e2;
+}
+
+.login-modal .btn-accent:hover {
+  background-color: #ff9b0f !important;
+}
+
+@media (max-width: 480px) {
+  .login-modal .rp-modal__panel {
+    border-radius: 24px;
+  }
+
+  .login-modal .rp-modal__head h3 {
+    font-size: 19px;
+  }
+
+  .login-modal .rp-modal__body {
+    font-size: 15px;
+  }
+}
+
+/* Profile avatar*/
+.rp-profile-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.rp-profile {
+  width: 40px !important;
+  height: 40px !important;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  border-radius: 999px !important;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.rp-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Dropdown: centered below the profile*/
+.rp-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.104);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.rp-dropdown-item {
+  width: 100%;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  font-size: 15px;
+  cursor: pointer;
+  transition: ease-in-out .5s;
+
+}
+
+.rp-dropdown-item:hover {
+  background: rgb(241, 241, 241);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.rp-profile {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.rp-profile i {
+  font-size: 38px;
+  line-height: 1;
+  color: #0f2a3f;
+}
+
+
+/* ===== Footer===== */
+.site-footer {
+  margin-top: 60px;
+  font-family: Poppins, sans-serif;
+  text-align: center;
+}
+
+/* Orange band */
+.footer-top {
+  background: white;
+  color: #1f1f1f;
+  padding: 24px 16px 26px;
+}
+
+.footer-tagline {
+  margin: 0 0 25px;
+  font-size: 16px !important;
+  line-height: 1.6;
+}
+
+/* Two logos centered */
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.footer-logos img {
+  max-height: 42px;
+  width: auto;
+  object-fit: contain;
+  filter: none;
+}
+/* Bottom grey strip */
+.footer-bottom {
+  background: #f7f3ef;
+  padding: 1px 20px !important;
+  color: #2a2a2a;
+  font-size: 13px;
+}
+
+@media (max-width:600px) {
+  .footer-logos {
+    gap: 18px
+  }
+
+  .footer-logos img {
+    max-height: 36px
+  }
+}
+
+.page,
+.about-main,
+.fav-wrap .page,
+.recipes-page {
+  width: 90% !important;  
+  max-width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rp-shell {
+  width: 93% !important;     /* same indent as page */
+  max-width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-inline: 50px !important; /* balanced inner spacing */
+}
+
+
+
+
+/* Burger button (inside pill, rightmost) */
+.rp-menu-btn{
+  display:none;
+  background:transparent; border:0;
+  font-size:28px; line-height:1;
+  color:#0f2a3f; cursor:pointer;
+  margin-left:auto;
+}
+
+/* ⚠️ Important: the mobile panel is FIXED at top
+   so it *overlays* the orange bar completely. */
+.mobile-panel{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background:#fff;
+  border-bottom:1px solid #e9e9e9;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  transform: translateY(-100%);        /* hidden above the viewport */
+  transition: transform .25s ease;
+  z-index: 2000;                        /* above the orange header */
+}
+.mobile-panel.is-open{ transform: translateY(0); }
+
+/* Panel head: logo + close */
+.mobile-panel__head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px; border-bottom:1px solid #e9e9e9;
+}
+.mobile-panel__close{ font-size:28px; line-height:1; background:none; border:0; color:#0f2a3f; cursor:pointer; }
+
+/* Mobile nav list = flat rows w/ separators */
+.mobile-nav{ display:block; padding:0; margin:0; }
+.mobile-nav :where(a,button){
+  display:flex; align-items:center; justify-content:center;
+  width:100%; height:56px;
+  font: 500 16px Poppins, sans-serif;
+  color:#0f2a3f; text-decoration:none; background:#fff; border:0; border-radius:0;
+}
+.mobile-nav :where(a,button) + :where(a,button){ border-top:1px solid #e9e9e9; }
+.mobile-nav :where(a,button):hover{ background:#DF861E; color:#fff; }
+.mobile-nav__cta{ background:#fff !important; color:#0f2a3f !important; }
+
+/* No dark scrim; keep page visible */
+.nav-overlay{ display:none !important; }
+
+/* Avoid any right-edge seam when menu opens */
+html, body { overflow-x: hidden; background:#fff; }
+:root{ --sbw: calc(100vw - 100%); }
+body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var(--sbw); }
+
+.mobile-nav :where(a,button){
+  height: 48px;                /* was 56px */
+  padding: 0 12px;             /* smaller side padding */
+  transition: background .18s ease, color .18s ease;
+}
+
+/* Hover / focus = orange */
+.mobile-nav :where(a,button):hover,
+.mobile-nav :where(a,button):focus-visible{
+  background:#DF861E;
+  color:#fff;
+  outline: none;               /* keep it clean */
+}
+
+/* Selected/active page (cover common cases: NavLink, aria-current, manual class) */
+.mobile-nav a.active,
+.mobile-nav a[aria-current="page"],
+.mobile-nav .is-active{
+  background:#DF861E !important;
+  color:#fff !important;
+  font-weight:600;
+}
+
+/* DESKTOP: hover + active color */
+.rp-nav .rp-link{
+  transition: color .18s ease;
+  padding-inline: 6px;         /* optional: a touch tighter */
+}
+.rp-nav .rp-link:hover,
+.rp-nav .rp-link:focus-visible{ color:#DF861E; }
+.rp-link--active{ color:#DF861E; font-weight:700; }
+
+/* Breakpoints */
+@media (max-width:1024px){ .rp-nav{ gap:20px; } }
+@media (max-width:900px){
+  .rp-nav, .rp-profile-wrap{ display:none; }  /* hide desktop nav/profile */
+  .rp-right{ display:flex; align-items:center; gap:0; width:100%; }
+  .rp-menu-btn{ display:block; }
+  .rp-shell{ height:56px; padding-inline:16px; }
+  .rp-logo-stack{ height:30px; }
+  .rp-wordmark{ font-size:17px; }
+}
+@media (max-width:420px){
+  .mobile-nav :where(a,button){ font-size:15px; height:52px; }
+}
+@media (max-width:360px){
+  .rp-shell{ padding-inline:12px; }
+  .rp-brand{ gap:6px; min-width:0; }
+  .rp-logo-stack{ height:30px; }
+  .rp-wordmark{ font-size:15px; line-height:1.05; }
+  .rp-menu-btn{ font-size:26px; }
+}
+
+
+/* Breakpoint */
+@media (max-width: 900px) {
+  .rp-nav,
+  .rp-profile-wrap {
+    display: none;
+  }
+  .rp-right {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+  }
+  .rp-menu-btn {
+    display: block;
+  }
+  .rp-shell {
+    height: 56px;
+    padding-inline: 16px;
+  }
+  .rp-logo-stack {
+    height: 30px;
+  }
+  .rp-wordmark {
+    font-size: 17px;
+  }
+}
+/* Tiny phones: tighten spacing a bit more */
+@media (max-width: 420px) {
+  .mobile-nav a, .mobile-nav button { font-size: 14px; padding: 11px 12px; }
+}
+/* Keep contents clipped to the white pill */
+.rp-shell { overflow: hidden; }
+
+/* Mobile layout: hide links/profile but KEEP rp-right (for the burger) */
+@media (max-width: 900px){
+  .rp-nav, .rp-profile-wrap { display:none; }
+  .rp-right { display:flex; align-items:center; gap:0; }
+  .rp-menu-btn { display:block; margin-left:auto; }  /* push burger to far-right */
+  .rp-shell { height:56px; padding-inline:30px !important; }
+  .rp-logo-stack { height:24px; }
+  .rp-wordmark { font-size:17px; }
+}
+
+/* Extra-tight phones (≤360px) — shrink brand & padding a bit more */
+@media (max-width: 360px){
+  .rp-shell      { padding-inline:12px; }
+  .rp-brand      { gap:6px; min-width:0; }
+  .rp-logo-stack { height:24px; }
+  .rp-wordmark   { font-size:15px; line-height:1.05; }
+  .rp-menu-btn   { font-size:28px; }
+}
+
+/* Micro (≤320px) — final squeeze to keep burger inside the pill */
+@media (max-width: 320px){
+  .rp-shell      { padding-inline:27px !important; }
+  .rp-wordmark   { font-size:14px; }
+  .rp-logo-stack { height:24px; }
+}
+
+
+/* ===== Footer Responsive Tweaks ===== */
+
+/* Tablets (≤900px) */
+@media (max-width: 900px) {
+  .footer-tagline {
+    font-size: 14px !important;
+    margin-bottom: 20px;
+  }
+
+  .footer-logos {
+    gap: 22px;
+  }
+
+  .footer-logos img {
+    max-height: 38px;
+  }
+
+  .footer-bottom {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+}
+
+/* Phones (≤600px) */
+@media (max-width: 600px) {
+  .footer-top {
+    padding: 20px 12px 22px;
+  }
+
+  .footer-tagline {
+    font-size: 14px !important;
+    line-height: 1.9;
+  }
+
+  .footer-logos {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .footer-logos img {
+    max-height: 34px;
+  }
+
+  .footer-bottom {
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+/* Extra small phones (≤360px) */
+@media (max-width: 360px) {
+  .footer-tagline {
+    font-size: 14px !important;
+    line-height: 1.9;
+  }
+
+  .footer-logos {
+    gap: 12px;
+  }
+
+  .footer-logos img {
+    max-height: 28px;
+  }
+
+  .footer-bottom {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+/* =========================
+   Login modal – compact & equal buttons
+   ========================= */
+   @media (max-width: 600px) {
+    .login-modal .rp-modal__panel {
+      width: min(300px, 90vw);
+      border-radius: 18px;
+      padding: 14px 0 10px 0;
+    }
+  
+    .login-modal__icon {
+      width: 52px; height: 52px;
+    }
+    .login-modal__icon i { font-size: 42px; }
+  
+    .login-modal .rp-modal__head { padding: 2px 16px 0; }
+    .login-modal .rp-modal__head h3 { font-size: 16px; }
+  
+    .login-modal .rp-modal__body {
+      padding: 6px 16px 2px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+  
+    /* Buttons row */
+    .login-modal .rp-modal__foot {
+      padding: 10px 12px 14px;
+    }
+/* === Login modal: make Cancel & Sign in EXACTLY the same size === */
+.login-modal .rp-modal__actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.login-modal .rp-modal__actions > .btn-plain,
+.login-modal .rp-modal__actions > .btn-accent {
+  /* same box for both (button and link) */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 1 1 0 !important;   /* equal width */
+  min-width: 0 !important;
+
+  height: 46px !important;  /* exact same height */
+  padding: 0 14px !important;  /* only horizontal padding */
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  border-radius: 14px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+
+  /* ensure both have a border so outline vs filled don't change height */
+  border: 1.5px solid transparent !important;
+}
+
+/* keep visual styles */
+.login-modal .rp-modal__actions > .btn-plain {
+  background: #fff !important;
+  color: #222 !important;
+  border-color: #1f1f1f33 !important;
+}
+
+.login-modal .rp-modal__actions > .btn-accent {
+  background: #DF861E !important; /* your orange */
+  color: #fff !important;
+  /* still has the same 1.5px transparent border from the rule above */
+}
+
+/* tiniest phones */
+@media (max-width: 360px){
+  .login-modal .rp-modal__actions > .btn-plain,
+  .login-modal .rp-modal__actions > .btn-accent {
+    height: 42px !important;
+    padding: 0 12px !important;
+    font-size: 13.5px !important;
+  }
+}
+
+   }
+
+   /* =========================================================
+   📱 Recipe Details Modal — responsive (Home / Recipes / Favorites)
+   ========================================================= */
+
+/* Tablet down */
+@media (max-width: 900px) {
+  /* panel sizing */
+  .rp-modal--recipe.rp-modal__panel,
+  .recipe-modal--simple.rp-modal__panel,
+  .rp-modal .rp-modal__panel.rp-modal--recipe,
+  .rp-modal .rp-modal__panel.recipe-modal--simple {
+    width: min(680px, 94vw);
+    border-radius: 20px;
+  }
+
+  /* banner/header */
+  .rmodal__banner {
+    padding: 10px 16px;
+  }
+
+  /* content */
+  .rp-modal__body.rmodal {
+    padding: 16px 18px;
+  }
+  .rmodal__name { font-size: 22px; line-height: 1.25; }
+}
+
+
+
+/* Phones */
+@media (max-width: 600px) {
+  /* make panel fill phone nicely and scroll inside */
+  .rp-modal--recipe.rp-modal__panel,
+  .recipe-modal--simple.rp-modal__panel,
+  .rp-modal .rp-modal__panel.rp-modal--recipe,
+  .rp-modal .rp-modal__panel.recipe-modal--simple {
+    width: 92vw;
+    max-height: 90svh;
+    border-radius: 18px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .rp-modal__close { top: 10px; right: 12px; font-size: 22px; }
+
+  .rmodal__banner {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  .rp-modal__body.rmodal {
+    padding: 14px 14px 16px;
+    max-height: calc(90svh - 44px); /* leave room for banner */
+    overflow: auto;
+  }
+
+  /* headings & text */
+  .rmodal__name { font-size: 20px; margin: 10px 0 8px; }
+  .rmodal__label { font-size: 16px; margin: 12px 0 8px; }
+
+  /* ingredient chips/cards → single column, compact */
+  .rmodal__chips { gap: 10px; }
+  .rmodal__chips--grid {
+    display: grid;
+    grid-template-columns: 1fr;      /* one per row on phones */
+    gap: 10px;
+  }
+  .ing.ing--card {
+    display: grid;
+    grid-template-columns: 48px 1fr; /* image + text */
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+  .ing.ing--card img {
+    width: 44px; height: 44px; object-fit: cover; border-radius: 8px;
+  }
+  .ing__name   { font-size: 14px; }
+  .ing__measure{ font-size: 12.5px; opacity: .85; }
+
+  /* instructions list */
+  .rmodal__steps { gap: 8px; }
+  .rmodal__steps li { font-size: 14px; line-height: 1.55; }
+
+  /* youtube button (solo) */
+  .rmodal__yt.rmodal__yt--solo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 420px) {
+  .rp-modal--recipe.rp-modal__panel,
+  .recipe-modal--simple.rp-modal__panel,
+  .rp-modal .rp-modal__panel.rp-modal--recipe,
+  .rp-modal .rp-modal__panel.recipe-modal--simple {
+    width: 94vw;
+    max-height: 92svh;
+    border-radius: 16px;
+  }
+  .rmodal__name { font-size: 18px; }
+  .ing.ing--card { grid-template-columns: 42px 1fr; padding: 9px 10px; }
+  .ing.ing--card img { width: 40px; height: 40px; }
+  .ing__name { font-size: 13.5px; }
+  .ing__measure { font-size: 12px; }
+}
+
+
+/* === Recipe Details modal: 2-per-row with vertical card layout on phones === */
+@media (max-width: 600px) {
+  /* keep two columns */
+  .recipe-modal--simple .rmodal__chips--grid,
+  .rp-modal--recipe .rmodal__chips--grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
+  /* stack image (top) then text (bottom) */
+  .recipe-modal--simple .ing.ing--card,
+  .rp-modal--recipe .ing.ing--card {
+    display: flex !important;          /* override any grid row layout */
+    flex-direction: column !important; /* image above text */
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    min-height: 140px;                  /* consistent card height */
+  }
+
+  .recipe-modal--simple .ing.ing--card img,
+  .rp-modal--recipe .ing.ing--card img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .recipe-modal--simple .ing__name,
+  .rp-modal--recipe .ing__name {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .recipe-modal--simple .ing__measure,
+  .rp-modal--recipe .ing__measure {
+    font-size: 12.5px;
+    opacity: .85;
+  }
+}
+
+/* optional: if it feels tight on ultra-small phones, drop to 1 per row */
+/*
+@media (max-width: 340px) {
+  .recipe-modal--simple .rmodal__chips--grid,
+  .rp-modal--recipe .rmodal__chips--grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+*/
