@@ -377,12 +377,16 @@ export default function AdminRecipesPage() {
 
     // ====== edit recipe modal ======
     const [openEditModal, setOpenEditModal] = useState(false);
+    const [originalMeal, setOriginalMeal] = useState<Meal | null>(null);
+    const [pristineOriginalMeal, setPristineOriginalMeal] = useState<Meal | null>(null);
     const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
     const [editFormData, setEditFormData] = useState<Meal | null>(null);
     const [editLoading, setEditLoading] = useState(false);
     const [editErr, setEditErr] = useState("");
     const [editSuccess, setEditSuccess] = useState(false);
+    const [restoreSuccess, setRestoreSuccess] = useState(false);
     const editSuccessTimerRef = useRef<number | null>(null);
+    const restoreSuccessTimerRef = useRef<number | null>(null);
 
     const openEditModal2 = (meal: Meal) => {
         // Convert ingredients from MealDB format to array format
@@ -406,29 +410,41 @@ export default function AdminRecipesPage() {
             strYoutube: meal.strYoutube || "",
         };
         
+        setOriginalMeal(meal);
+        // Only set pristineOriginalMeal on first open - preserves truly original data
+        if (!pristineOriginalMeal) {
+            setPristineOriginalMeal(meal);
+        }
         setEditingMeal(meal);
         setEditFormData(formData);
         setEditErr("");
-        setEditSuccess(false);
         setOpenEditModal(true);
-        document.body.classList.add("rp-noscroll");
     };
 
     const closeEditModal = () => {
         setOpenEditModal(false);
+        setOriginalMeal(null);
+        setPristineOriginalMeal(null);
         setEditingMeal(null);
         setEditFormData(null);
         document.body.classList.remove("rp-noscroll");
     };
 
     const restoreOriginalRecipe = () => {
-        if (!editingMeal) return;
+        console.log("Restore button clicked");
+        console.log("pristineOriginalMeal:", pristineOriginalMeal);
         
-        // Convert ingredients back from original meal data
+        if (!pristineOriginalMeal) {
+            console.error("No pristineOriginalMeal found!");
+            return;
+        }
+        
+        // Convert ingredients back from PRISTINE ORIGINAL meal data
         const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
         for (let i = 1; i <= 20; i++) {
-            const ing = editingMeal[`strIngredient${i}`];
-            const mea = editingMeal[`strMeasure${i}`];
+            const ing = pristineOriginalMeal[`strIngredient${i}`];
+            const mea = pristineOriginalMeal[`strMeasure${i}`];
+            console.log(`i=${i}, ing="${ing}", mea="${mea}"`);
             if (ing && String(ing).trim()) {
                 const ingredientName = String(ing).trim();
                 ingredients.push({
@@ -439,14 +455,28 @@ export default function AdminRecipesPage() {
             }
         }
 
+        console.log("Restored ingredients:", ingredients);
+
         const formData = { 
-            ...editingMeal, 
+            ...pristineOriginalMeal, 
             ingredients,
-            strYoutube: editingMeal.strYoutube || "",
+            strYoutube: pristineOriginalMeal.strYoutube || "",
         };
         
+        console.log("Setting formData with restored data:", formData);
         setEditFormData(formData);
         setEditErr("");
+        setRestoreSuccess(true);
+        
+        // Auto-close after 2 seconds
+        if (restoreSuccessTimerRef.current) {
+            clearTimeout(restoreSuccessTimerRef.current);
+        }
+        restoreSuccessTimerRef.current = window.setTimeout(() => {
+            setRestoreSuccess(false);
+        }, 2000);
+        
+        console.log("Restore complete");
     };
 
     const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -515,10 +545,12 @@ export default function AdminRecipesPage() {
                 
                 // Add strIngredient and strMeasure fields for MealDB compatibility
                 if (Array.isArray(savedRecipe.ingredients)) {
+                    console.log("Converting ingredients for storage, count:", savedRecipe.ingredients.length);
                     savedRecipe.ingredients.forEach((ing: any, idx: number) => {
                         convertedRecipe[`strIngredient${idx + 1}`] = ing.name || "";
                         convertedRecipe[`strMeasure${idx + 1}`] = ing.measure || "";
                     });
+                    console.log("Converted recipe fields:", Object.keys(convertedRecipe).filter(k => k.startsWith('strIngredient') || k.startsWith('strMeasure')));
                 }
                 
                 // Update the recipe in the local state
@@ -528,7 +560,7 @@ export default function AdminRecipesPage() {
                 setAll(updatedAll);
                 setFull(updatedAll);
                 
-                // Update editingMeal so restore works with new data
+                // Update editingMeal with saved data (but keep originalMeal unchanged for restore)
                 setEditingMeal(convertedRecipe);
             }
 
@@ -1192,9 +1224,8 @@ export default function AdminRecipesPage() {
                             <div className="edit-actions">
                                 <button
                                     type="button"
-                                    className="edit-cancel"
+                                    className="edit-restore"
                                     onClick={restoreOriginalRecipe}
-                                    disabled={editLoading}
                                     title="Restore original recipe details"
                                     style={{ marginRight: "auto" }}
                                 >
@@ -1228,6 +1259,17 @@ export default function AdminRecipesPage() {
                         <div className="success-card" role="alert">
                             <i className="bi bi-check-circle-fill success-icon" />
                             <p>Recipe updated successfully</p>
+                        </div>
+                    </div>
+                )}
+
+                {restoreSuccess && (
+                    <div className="rp-modal is-open">
+                        <div className="rp-modal__scrim" />
+
+                        <div className="success-card" role="alert">
+                            <i className="bi bi-check-circle-fill success-icon" />
+                            <p>Successfully restored the recipe information</p>
                         </div>
                     </div>
                 )}
@@ -2030,7 +2072,8 @@ export default function AdminRecipesPage() {
         }
 
         .edit-cancel,
-        .edit-save {
+        .edit-save,
+        .edit-restore {
           padding: 10px 20px;
           border: 0;
           border-radius: 8px;
@@ -2047,6 +2090,15 @@ export default function AdminRecipesPage() {
 
         .edit-cancel:hover:not(:disabled) {
           background: #d0d0d0;
+        }
+
+        .edit-restore {
+          background: #4CAF50;
+          color: #fff;
+        }
+
+        .edit-restore:hover {
+          background: #45a049;
         }
 
         .edit-save {
@@ -2513,3 +2565,4 @@ export default function AdminRecipesPage() {
         </>
     );
 }
+
