@@ -8,36 +8,28 @@ export async function POST(req: Request) {
 
     if (!username || !password) {
       return NextResponse.json(
-        { message: "Missing credentials" },
+        { message: "Missing username or password" },
         { status: 400 }
       );
     }
 
-    const snap = await adminDb.collection("admin").doc("rpadmin").get();
+    //admin collection
+    const adminRef = adminDb.collection("admin").doc(username);
+    const adminSnap = await adminRef.get();
 
-    if (!snap.exists) {
-      return NextResponse.json(
-        { message: "Admin account not found" },
-        { status: 404 }
-      );
-    }
-
-   
-    const admin = snap.data() as {
-      username: string;
-      passwordHash: string;
-    };
-
-    // Check username
-    if (admin.username !== username) {
+    if (!adminSnap.exists) {
       return NextResponse.json(
         { message: "Invalid username or password" },
         { status: 401 }
       );
     }
 
-    // Check password
-    const isValid = await bcrypt.compare(password, admin.passwordHash);
+    const adminData = adminSnap.data();
+
+    const isValid = await bcrypt.compare(
+      password,
+      adminData?.passwordHash
+    );
 
     if (!isValid) {
       return NextResponse.json(
@@ -46,11 +38,15 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error(err);
     return NextResponse.json(
-      { message: "Login failed" },
+      { message: "Login successful" },
+      { status: 200 }
+    );
+
+  } catch (err) {
+    console.error("Admin login error:", err);
+    return NextResponse.json(
+      { message: "Server error" },
       { status: 500 }
     );
   }
