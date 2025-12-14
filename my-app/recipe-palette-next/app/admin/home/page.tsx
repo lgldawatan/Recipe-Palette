@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface HomeContent {
@@ -11,6 +11,7 @@ interface HomeContent {
 
 export default function AdminHomePage() {
   const router = useRouter();
+  const messageTimerRef = useRef<number | null>(null);
 
   const [content, setContent] = useState<HomeContent>({
     bannerText: "",
@@ -22,6 +23,12 @@ export default function AdminHomePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("success");
+
+  const defaultContent: HomeContent = {
+    bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
+    aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
+    addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
+  };
 
   // Fetch home content
   useEffect(() => {
@@ -75,6 +82,50 @@ export default function AdminHomePage() {
       setMessage(`Failed to save content: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setSaving(false);
+      
+      // Auto-close success message after 2 seconds
+      if (messageType === "success") {
+        if (messageTimerRef.current) {
+          clearTimeout(messageTimerRef.current);
+        }
+        messageTimerRef.current = window.setTimeout(() => {
+          setMessage("");
+        }, 2000);
+      }
+    }
+  };
+
+  const handleRestore = async () => {
+    setSaving(true);
+    try {
+      // Save default content to Firestore
+      const res = await fetch("/api/admin/home", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(defaultContent),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to restore content");
+      }
+
+      setContent(defaultContent);
+      setMessageType("success");
+      setMessage("Content restored to defaults");
+      
+      // Auto-close after 2 seconds
+      if (messageTimerRef.current) {
+        clearTimeout(messageTimerRef.current);
+      }
+      messageTimerRef.current = window.setTimeout(() => {
+        setMessage("");
+      }, 2000);
+    } catch (error) {
+      console.error("Restore error:", error);
+      setMessageType("error");
+      setMessage(`Failed to restore content: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -91,20 +142,29 @@ export default function AdminHomePage() {
       {/* Page Header */}
       <div className="rp-admin-page-header">
         <h1>Manage Home Page Content</h1>
-        <button
-          className="rp-btn-primary"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <button
+            className="rp-btn-restore"
+            onClick={handleRestore}
+            disabled={saving}
+          >
+            {saving ? "Restoring..." : "Restore"}
+          </button>
+          <button
+            className="rp-btn-primary"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </div>
 
       {/* Success Dialog */}
       {message && messageType === "success" && (
-        <div className="rp-modal is-open">
+        <div className="rp-modal is-open" onClick={() => setMessage("")}>
           <div className="rp-modal__scrim" />
-          <div className="success-card" role="alert">
+          <div className="success-card" role="alert" onClick={(e) => e.stopPropagation()}>
             <i className="bi bi-check-circle-fill success-icon" />
             <p>{message}</p>
           </div>
@@ -184,6 +244,22 @@ export default function AdminHomePage() {
         .rp-btn-primary:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+
+        .rp-btn-restore {
+          padding: 0.75rem 1.5rem;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 600;
+          transition: background-color 0.3s;
+        }
+
+        .rp-btn-restore:hover {
+          background-color: #45a049;
         }
 
         .rp-admin-message {
