@@ -1,0 +1,178 @@
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Fixed Header */
+.admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #d97706;
+  color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.admin-header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.admin-mobile-menu-btn {
+  display: none;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Main Layout */
+.admin-main {
+  display: flex;
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 2rem;
+  padding: 2rem 1rem;
+  padding-top: 5rem;
+  width: 100%;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 250px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.admin-nav-link:hover {
+  background-color: #f3f4f6;
+}
+
+.admin-nav-link.active {
+  background-color: #d97706;
+  color: white;
+}
+
+.admin-profile-wrap {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.admin-profile-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.95rem;
+}
+
+.admin-profile-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.admin-profile-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.admin-dropdown-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.95rem;
+}
+
+.admin-dropdown-btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* Content Area */
+.admin-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .admin-mobile-menu-btn {
+    display: block;
+  }
+
+  .admin-main {
+    flex-direction: column;
+    padding-top: 3rem;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    position: static;
+    display: none;
+  }
+
+  .admin-sidebar.open {
+    display: block;
+  }
+}

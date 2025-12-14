@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { signOut } from "firebase/auth";
+import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Home.css";
 import "./index.css";
@@ -19,6 +20,60 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
 
   const navigate = useNavigate();
   const scrollLockY = useRef(0);
+
+  /* ================================
+     MANAGED CONTENT STATE
+     ================================ */
+  const [managedContent, setManagedContent] = useState({
+    bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
+    aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
+    addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
+  });
+
+  // Fetch managed home content with real-time listener
+  useEffect(() => {
+    const db = getFirestore();
+    const docRef = doc(db, "config", "homeContent");
+
+    const defaultContent = {
+      bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
+      aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
+      addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
+    };
+
+    console.log("Setting up Firestore listener for home content...");
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const firestoreData = docSnap.data();
+          console.log("Firestore data updated:", firestoreData);
+          // Merge Firestore data with defaults
+          const merged = {
+            ...defaultContent,
+            ...firestoreData,
+          };
+          setManagedContent(merged);
+        } else {
+          console.log("No Firestore document found, using defaults");
+          setManagedContent(defaultContent);
+        }
+      },
+      (error) => {
+        console.error("Firestore listener error:", error);
+        // Fall back to defaults if Firestore is unavailable
+        setManagedContent(defaultContent);
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => {
+      console.log("Cleaning up Firestore listener");
+      unsubscribe();
+    };
+  }, []);
 
   async function handleLogout() {
     await signOut(auth);
@@ -295,10 +350,9 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
         <section className="hero">
           <div className="hero__bg"></div>
           <div className="hero__content">
-            <h1>DISCOVER TASTE INSPIRATION</h1>
+            <h1>{managedContent.bannerText.split('\n')[0]}</h1>
             <p className="lead">
-              Explore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art.
-              Turn everyday cooking into moments of creativity and delight.
+              {managedContent.bannerText.split('\n').slice(1).join('\n')}
             </p>
             <Link to="/recipes" className="btn-accent">Discover More</Link>
           </div>
@@ -310,8 +364,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           <div className="about__card">
             <h2>About Us</h2>
             <p>
-              At <strong>recipe palette.</strong> we believe cooking is more than just making meals—it’s an art.
-              Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.
+              {managedContent.aboutUsText}
             </p>
             <Link to="/about" className="btn-about">Learn More</Link>
           </div>
@@ -374,8 +427,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           <div className="cta-fav__card">
             <h3>Add to Favorites</h3>
             <p>
-              Whether you’re trying something new or perfecting a family classic, <strong>recipe palette.</strong> is your space to learn, create,
-              and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.
+              {managedContent.addToFavoritesText}
             </p>
 
             {isAuthed ? (

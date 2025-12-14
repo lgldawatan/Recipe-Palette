@@ -38,10 +38,20 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Login successful" },
       { status: 200 }
     );
+    
+    // Set authentication cookie
+    response.cookies.set("adminAuth", username, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return response;
 
   } catch (err) {
     console.error("Admin login error:", err);
