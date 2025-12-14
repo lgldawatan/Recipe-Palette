@@ -210,6 +210,10 @@ export default function AdminHomePage() {
       </div>
 
       <style jsx>{`
+        * {
+          font-family: "Poppins", system-ui, -apple-system, sans-serif;
+        }
+
         .rp-admin-page-header {
           display: flex;
           justify-content: space-between;
@@ -377,6 +381,7 @@ function EditSection({
           padding: 2rem;
           border-radius: 8px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          font-family: "Poppins", system-ui, -apple-system, sans-serif;
         }
 
         .rp-section-title {

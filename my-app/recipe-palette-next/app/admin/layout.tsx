@@ -54,6 +54,10 @@ export default function AdminLayout({
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet"
       />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
 
       {/* Header */}
       <header className="rp-header">
@@ -275,6 +279,7 @@ export default function AdminLayout({
           font-size: 16px;
           text-align: left;
           display: block;
+          font-family: "Fredoka", system-ui, sans-serif;
         }
 
         /* NAV */
