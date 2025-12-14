@@ -386,14 +386,16 @@ export default function AdminRecipesPage() {
 
     const openEditModal2 = (meal: Meal) => {
         // Convert ingredients from MealDB format to array format
-        const ingredients: Array<{ name: string; measure: string }> = [];
+        const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
         for (let i = 1; i <= 20; i++) {
             const ing = meal[`strIngredient${i}`];
             const mea = meal[`strMeasure${i}`];
             if (ing && String(ing).trim()) {
+                const ingredientName = String(ing).trim();
                 ingredients.push({
-                    name: String(ing).trim(),
+                    name: ingredientName,
                     measure: String(mea || "").trim(),
+                    image: `https://www.themealdb.com/images/ingredients/${ingredientName}.png`,
                 });
             }
         }
@@ -428,7 +430,7 @@ export default function AdminRecipesPage() {
         if (!editFormData) return;
         const ing = editFormData.ingredients || [];
         while (ing.length <= index) {
-            ing.push({ name: "", measure: "" });
+            ing.push({ name: "", measure: "", image: "" });
         }
         ing[index] = { ...ing[index], [field]: value };
         setEditFormData({ ...editFormData, ingredients: ing });
@@ -1041,85 +1043,103 @@ export default function AdminRecipesPage() {
                             {editErr && <div className="edit-error">{editErr}</div>}
 
                             <div className="edit-body">
-                                {/* Recipe Image */}
-                                {editFormData.strMealThumb && (
-                                    <div className="edit-image-container">
-                                        <img
-                                            src={editFormData.strMealThumb}
-                                            alt={editFormData.strMeal}
-                                            className="edit-recipe-image"
-                                        />
-                                    </div>
-                                )}
-
-                                <div className="edit-row">
-                                    {/* Left Column - Ingredients */}
+                                <div className="edit-row" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                                    {/* Ingredients Section */}
                                     <div className="edit-column edit-left">
                                         <div className="edit-section">
-                                            <h3 className="edit-section-title">Recipe Details</h3>
-                                            <div className="edit-field">
-                                                <label>Recipe Name *</label>
-                                                <input
-                                                    type="text"
-                                                    name="strMeal"
-                                                    value={editFormData.strMeal || ""}
-                                                    onChange={handleEditFormChange}
-                                                    placeholder="Enter recipe name"
-                                                />
+                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                                                <h3 className="edit-section-title">Ingredients</h3>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const ing = editFormData.ingredients || [];
+                                                        setEditFormData({ ...editFormData, ingredients: [...ing, { name: "", measure: "", image: "" }] });
+                                                    }}
+                                                    style={{
+                                                        padding: "6px 12px",
+                                                        backgroundColor: "#4CAF50",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                        fontSize: "14px"
+                                                    }}
+                                                >
+                                                    + Add Ingredient
+                                                </button>
                                             </div>
-
-                                            <div className="edit-field">
-                                                <label>Category *</label>
-                                                <input
-                                                    type="text"
-                                                    name="strCategory"
-                                                    value={editFormData.strCategory || ""}
-                                                    onChange={handleEditFormChange}
-                                                    placeholder="Enter category"
-                                                />
-                                            </div>
-
-                                            <div className="edit-field">
-                                                <label>Area/Cuisine *</label>
-                                                <input
-                                                    type="text"
-                                                    name="strArea"
-                                                    value={editFormData.strArea || ""}
-                                                    onChange={handleEditFormChange}
-                                                    placeholder="Enter area/cuisine"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="edit-section">
-                                            <h3 className="edit-section-title">Ingredients</h3>
-                                            <div className="ingredients-list">
-                                                {Array.from({ length: 5 }).map((_, i) => {
-                                                    const ing = (editFormData.ingredients || [])[i] || {};
+                                            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", maxHeight: "500px", overflowY: "auto", paddingRight: "8px" }}>
+                                                {(editFormData.ingredients || []).map((ing: any, i: number) => {
                                                     return (
-                                                        <div key={i} className="ingredient-row">
+                                                        <div key={i} style={{ position: "relative", display: "flex", flexDirection: "column", gap: "8px", padding: "12px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#fff" }}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const updatedIngredients = (editFormData.ingredients || []).slice(0, i).concat((editFormData.ingredients || []).slice(i + 1));
+                                                                    setEditFormData({
+                                                                        ...editFormData,
+                                                                        ingredients: updatedIngredients
+                                                                    });
+                                                                }}
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: "8px",
+                                                                    right: "8px",
+                                                                    padding: "4px 8px",
+                                                                    backgroundColor: "#f44336",
+                                                                    color: "white",
+                                                                    border: "none",
+                                                                    borderRadius: "4px",
+                                                                    cursor: "pointer",
+                                                                    fontSize: "12px",
+                                                                    zIndex: 1
+                                                                }}
+                                                            >
+                                                                <i className="bi bi-trash" style={{ fontSize: "14px" }} />
+                                                            </button>
+                                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80px" }}>
+                                                                {ing.image ? (
+                                                                    <img
+                                                                        src={ing.image}
+                                                                        alt={ing.name || "Ingredient"}
+                                                                        style={{ maxWidth: "70px", maxHeight: "70px", objectFit: "contain" }}
+                                                                    />
+                                                                ) : (
+                                                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "32px" }}>
+                                                                        <i className="bi bi-image" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                             <input
                                                                 type="text"
-                                                                placeholder={`Ingredient ${i + 1}`}
+                                                                placeholder="Ingredient Name"
                                                                 value={ing.name || ""}
-                                                                onChange={(e) =>
-                                                                    updateIngredient(i, "name", e.target.value)
-                                                                }
-                                                                className="ingredient-input"
+                                                                onChange={(e) => updateIngredient(i, "name", e.target.value)}
+                                                                style={{ width: "100%", padding: "6px 8px", border: "none", fontSize: "14px", fontWeight: "600", outline: "none", textAlign: "center" }}
                                                             />
                                                             <input
                                                                 type="text"
                                                                 placeholder="Measure"
                                                                 value={ing.measure || ""}
-                                                                onChange={(e) =>
-                                                                    updateIngredient(i, "measure", e.target.value)
-                                                                }
-                                                                className="ingredient-measure"
+                                                                onChange={(e) => updateIngredient(i, "measure", e.target.value)}
+                                                                style={{ width: "100%", padding: "6px 8px", border: "none", fontSize: "12px", outline: "none", textAlign: "center", color: "#666" }}
                                                             />
                                                         </div>
                                                     );
                                                 })}
                                             </div>
+                                        </div>
+
+                                        <div className="edit-section">
+                                            <h3 className="edit-section-title">Instructions *</h3>
+                                            <textarea
+                                                name="strInstructions"
+                                                value={editFormData.strInstructions || ""}
+                                                onChange={handleEditFormChange}
+                                                placeholder="Enter cooking instructions"
+                                                className="instructions-textarea"
+                                                style={{ resize: "none", height: "160px" }}
+                                            />
                                         </div>
 
                                         <div className="edit-section">
@@ -1131,20 +1151,6 @@ export default function AdminRecipesPage() {
                                                 onChange={handleEditFormChange}
                                                 placeholder="https://youtube.com/..."
                                                 className="youtube-input"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Right Column - Instructions */}
-                                    <div className="edit-column edit-right">
-                                        <div className="edit-section">
-                                            <h3 className="edit-section-title">Instructions *</h3>
-                                            <textarea
-                                                name="strInstructions"
-                                                value={editFormData.strInstructions || ""}
-                                                onChange={handleEditFormChange}
-                                                placeholder="Enter cooking instructions"
-                                                className="instructions-textarea"
                                             />
                                         </div>
                                     </div>
