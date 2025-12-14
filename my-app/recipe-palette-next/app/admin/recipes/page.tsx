@@ -421,6 +421,34 @@ export default function AdminRecipesPage() {
         document.body.classList.remove("rp-noscroll");
     };
 
+    const restoreOriginalRecipe = () => {
+        if (!editingMeal) return;
+        
+        // Convert ingredients back from original meal data
+        const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
+        for (let i = 1; i <= 20; i++) {
+            const ing = editingMeal[`strIngredient${i}`];
+            const mea = editingMeal[`strMeasure${i}`];
+            if (ing && String(ing).trim()) {
+                const ingredientName = String(ing).trim();
+                ingredients.push({
+                    name: ingredientName,
+                    measure: String(mea || "").trim(),
+                    image: `https://www.themealdb.com/images/ingredients/${ingredientName}.png`,
+                });
+            }
+        }
+
+        const formData = { 
+            ...editingMeal, 
+            ingredients,
+            strYoutube: editingMeal.strYoutube || "",
+        };
+        
+        setEditFormData(formData);
+        setEditErr("");
+    };
+
     const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setEditFormData((prev) => (prev ? { ...prev, [name]: value } : null));
@@ -475,12 +503,34 @@ export default function AdminRecipesPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-            // Update the local state with edited recipe
-            const updatedAll = all.map((m) =>
-                m.idMeal === editFormData.idMeal ? editFormData : m
-            );
-            setAll(updatedAll);
-            setFull(updatedAll);
+            // Convert response data back to MealDB format
+            if (data && data.data) {
+                const savedRecipe = data.data;
+                
+                // Convert ingredients array back to individual strIngredient and strMeasure fields
+                const convertedRecipe: any = {
+                    ...savedRecipe,
+                    strMealThumb: editFormData.strMealThumb,
+                };
+                
+                // Add strIngredient and strMeasure fields for MealDB compatibility
+                if (Array.isArray(savedRecipe.ingredients)) {
+                    savedRecipe.ingredients.forEach((ing: any, idx: number) => {
+                        convertedRecipe[`strIngredient${idx + 1}`] = ing.name || "";
+                        convertedRecipe[`strMeasure${idx + 1}`] = ing.measure || "";
+                    });
+                }
+                
+                // Update the recipe in the local state
+                const updatedAll = all.map((m) =>
+                    m.idMeal === convertedRecipe.idMeal ? convertedRecipe : m
+                );
+                setAll(updatedAll);
+                setFull(updatedAll);
+                
+                // Update editingMeal so restore works with new data
+                setEditingMeal(convertedRecipe);
+            }
 
             // SHOW SUCCESS MODAL
             setOpenEditModal(false);
@@ -1020,24 +1070,6 @@ export default function AdminRecipesPage() {
                         <div className="edit-card" role="dialog" aria-modal="true" aria-label="Edit Recipe">
                             <div className="edit-head">
                                 <div className="edit-title">Learn About The Recipe</div>
-                                <div className="edit-icons">
-                                    <button
-                                        type="button"
-                                        className="edit-icon-btn"
-                                        aria-label="Save"
-                                        title="Save"
-                                    >
-                                        <i className="bi bi-bookmark" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="edit-close"
-                                        aria-label="Close"
-                                        onClick={closeEditModal}
-                                    >
-                                        <i className="bi bi-x-lg" />
-                                    </button>
-                                </div>
                             </div>
 
                             {editErr && <div className="edit-error">{editErr}</div>}
@@ -1158,6 +1190,16 @@ export default function AdminRecipesPage() {
                             </div>
 
                             <div className="edit-actions">
+                                <button
+                                    type="button"
+                                    className="edit-cancel"
+                                    onClick={restoreOriginalRecipe}
+                                    disabled={editLoading}
+                                    title="Restore original recipe details"
+                                    style={{ marginRight: "auto" }}
+                                >
+                                    Restore
+                                </button>
                                 <button
                                     type="button"
                                     className="edit-cancel"
