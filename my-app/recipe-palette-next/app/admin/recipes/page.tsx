@@ -375,6 +375,126 @@ export default function AdminRecipesPage() {
         }
     };
 
+    // ====== edit recipe modal ======
+    const [openEditModal, setOpenEditModal] = useState(false);
+    const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
+    const [editFormData, setEditFormData] = useState<Meal | null>(null);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editErr, setEditErr] = useState("");
+    const [editSuccess, setEditSuccess] = useState(false);
+    const editSuccessTimerRef = useRef<number | null>(null);
+
+    const openEditModal2 = (meal: Meal) => {
+        // Convert ingredients from MealDB format to array format
+        const ingredients: Array<{ name: string; measure: string }> = [];
+        for (let i = 1; i <= 20; i++) {
+            const ing = meal[`strIngredient${i}`];
+            const mea = meal[`strMeasure${i}`];
+            if (ing && String(ing).trim()) {
+                ingredients.push({
+                    name: String(ing).trim(),
+                    measure: String(mea || "").trim(),
+                });
+            }
+        }
+
+        const formData = { 
+            ...meal, 
+            ingredients,
+            strYoutube: meal.strYoutube || "",
+        };
+        
+        setEditingMeal(meal);
+        setEditFormData(formData);
+        setEditErr("");
+        setEditSuccess(false);
+        setOpenEditModal(true);
+        document.body.classList.add("rp-noscroll");
+    };
+
+    const closeEditModal = () => {
+        setOpenEditModal(false);
+        setEditingMeal(null);
+        setEditFormData(null);
+        document.body.classList.remove("rp-noscroll");
+    };
+
+    const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setEditFormData((prev) => (prev ? { ...prev, [name]: value } : null));
+    };
+
+    const updateIngredient = (index: number, field: "name" | "measure", value: string) => {
+        if (!editFormData) return;
+        const ing = editFormData.ingredients || [];
+        while (ing.length <= index) {
+            ing.push({ name: "", measure: "" });
+        }
+        ing[index] = { ...ing[index], [field]: value };
+        setEditFormData({ ...editFormData, ingredients: ing });
+    };
+
+    const saveEditedRecipe = async () => {
+        if (!editFormData) return;
+
+        setEditErr("");
+
+        const mealName = editFormData.strMeal?.trim();
+        const category = editFormData.strCategory?.trim();
+        const area = editFormData.strArea?.trim();
+        const instructions = editFormData.strInstructions?.trim();
+
+        if (!mealName || !category || !area || !instructions) {
+            return setEditErr("Please fill out all required fields.");
+        }
+
+        setEditLoading(true);
+
+        try {
+            const filteredIngredients = Array.isArray(editFormData.ingredients)
+                ? editFormData.ingredients.filter((ing: any) => ing && ing.name && String(ing.name).trim())
+                : [];
+
+            const res = await fetch("/api/admin/edit-recipe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    idMeal: editFormData.idMeal,
+                    strMeal: mealName,
+                    strCategory: category,
+                    strArea: area,
+                    strInstructions: instructions,
+                    strMealThumb: editFormData.strMealThumb,
+                    strYoutube: editFormData.strYoutube ? String(editFormData.strYoutube).trim() : "",
+                    ingredients: filteredIngredients,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            // Update the local state with edited recipe
+            const updatedAll = all.map((m) =>
+                m.idMeal === editFormData.idMeal ? editFormData : m
+            );
+            setAll(updatedAll);
+            setFull(updatedAll);
+
+            // SHOW SUCCESS MODAL
+            setOpenEditModal(false);
+            setEditSuccess(true);
+
+            // auto-close after 2 seconds
+            editSuccessTimerRef.current = window.setTimeout(() => {
+                setEditSuccess(false);
+            }, 2000);
+        } catch (e: any) {
+            setEditErr(e.message || "Failed to update recipe.");
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
 
     return (
         <>
@@ -643,7 +763,7 @@ export default function AdminRecipesPage() {
                                         <button
                                             type="button"
                                             className="r-edit-btn"
-                                            onClick={() => alert(`Edit recipe: ${m.idMeal} (next page)`)}
+                                            onClick={() => openEditModal2(m)}
                                             aria-label={`Edit ${m.strMeal}`}
                                             title="Edit"
                                         >
@@ -879,6 +999,187 @@ export default function AdminRecipesPage() {
                         <div className="success-card" role="alert">
                             <i className="bi bi-check-circle-fill success-icon" />
                             <p>All changes have been applied successfully</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* ====== EDIT RECIPE MODAL ====== */}
+                {openEditModal && editFormData && (
+                    <div
+                        className="rp-modal is-open rp-edit"
+                        aria-hidden="false"
+                        onClick={(e) => {
+                            const el = e.target as HTMLElement;
+                            if (el.classList.contains("rp-modal__scrim")) closeEditModal();
+                        }}
+                    >
+                        <div className="rp-modal__scrim" />
+
+                        <div className="edit-card" role="dialog" aria-modal="true" aria-label="Edit Recipe">
+                            <div className="edit-head">
+                                <div className="edit-title">Learn About The Recipe</div>
+                                <div className="edit-icons">
+                                    <button
+                                        type="button"
+                                        className="edit-icon-btn"
+                                        aria-label="Save"
+                                        title="Save"
+                                    >
+                                        <i className="bi bi-bookmark" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="edit-close"
+                                        aria-label="Close"
+                                        onClick={closeEditModal}
+                                    >
+                                        <i className="bi bi-x-lg" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {editErr && <div className="edit-error">{editErr}</div>}
+
+                            <div className="edit-body">
+                                {/* Recipe Image */}
+                                {editFormData.strMealThumb && (
+                                    <div className="edit-image-container">
+                                        <img
+                                            src={editFormData.strMealThumb}
+                                            alt={editFormData.strMeal}
+                                            className="edit-recipe-image"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="edit-row">
+                                    {/* Left Column - Ingredients */}
+                                    <div className="edit-column edit-left">
+                                        <div className="edit-section">
+                                            <h3 className="edit-section-title">Recipe Details</h3>
+                                            <div className="edit-field">
+                                                <label>Recipe Name *</label>
+                                                <input
+                                                    type="text"
+                                                    name="strMeal"
+                                                    value={editFormData.strMeal || ""}
+                                                    onChange={handleEditFormChange}
+                                                    placeholder="Enter recipe name"
+                                                />
+                                            </div>
+
+                                            <div className="edit-field">
+                                                <label>Category *</label>
+                                                <input
+                                                    type="text"
+                                                    name="strCategory"
+                                                    value={editFormData.strCategory || ""}
+                                                    onChange={handleEditFormChange}
+                                                    placeholder="Enter category"
+                                                />
+                                            </div>
+
+                                            <div className="edit-field">
+                                                <label>Area/Cuisine *</label>
+                                                <input
+                                                    type="text"
+                                                    name="strArea"
+                                                    value={editFormData.strArea || ""}
+                                                    onChange={handleEditFormChange}
+                                                    placeholder="Enter area/cuisine"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="edit-section">
+                                            <h3 className="edit-section-title">Ingredients</h3>
+                                            <div className="ingredients-list">
+                                                {Array.from({ length: 5 }).map((_, i) => {
+                                                    const ing = (editFormData.ingredients || [])[i] || {};
+                                                    return (
+                                                        <div key={i} className="ingredient-row">
+                                                            <input
+                                                                type="text"
+                                                                placeholder={`Ingredient ${i + 1}`}
+                                                                value={ing.name || ""}
+                                                                onChange={(e) =>
+                                                                    updateIngredient(i, "name", e.target.value)
+                                                                }
+                                                                className="ingredient-input"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Measure"
+                                                                value={ing.measure || ""}
+                                                                onChange={(e) =>
+                                                                    updateIngredient(i, "measure", e.target.value)
+                                                                }
+                                                                className="ingredient-measure"
+                                                            />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        <div className="edit-section">
+                                            <h3 className="edit-section-title">Youtube Link</h3>
+                                            <input
+                                                type="text"
+                                                name="strYoutube"
+                                                value={editFormData.strYoutube || ""}
+                                                onChange={handleEditFormChange}
+                                                placeholder="https://youtube.com/..."
+                                                className="youtube-input"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Right Column - Instructions */}
+                                    <div className="edit-column edit-right">
+                                        <div className="edit-section">
+                                            <h3 className="edit-section-title">Instructions *</h3>
+                                            <textarea
+                                                name="strInstructions"
+                                                value={editFormData.strInstructions || ""}
+                                                onChange={handleEditFormChange}
+                                                placeholder="Enter cooking instructions"
+                                                className="instructions-textarea"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="edit-actions">
+                                <button
+                                    type="button"
+                                    className="edit-cancel"
+                                    onClick={closeEditModal}
+                                    disabled={editLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    className="edit-save"
+                                    onClick={saveEditedRecipe}
+                                    disabled={editLoading}
+                                >
+                                    {editLoading ? "Saving..." : "Save"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {editSuccess && (
+                    <div className="rp-modal is-open">
+                        <div className="rp-modal__scrim" />
+
+                        <div className="success-card" role="alert">
+                            <i className="bi bi-check-circle-fill success-icon" />
+                            <p>Recipe updated successfully</p>
                         </div>
                     </div>
                 )}
@@ -1442,6 +1743,300 @@ export default function AdminRecipesPage() {
         .cpw-eye:hover{
         color: rgba(0,0,0,0.8);
         }
+
+        /* Edit Recipe Modal */
+        .edit-card {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: min(920px, 92vw);
+          max-height: 90vh;
+          overflow-y: auto;
+          border-radius: 18px;
+          background: #fff;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .edit-head {
+          background: var(--orange);
+          color: #fff;
+          padding: 18px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          flex-shrink: 0;
+        }
+
+        .edit-title {
+          font-size: 20px;
+          font-weight: 700;
+        }
+
+        .edit-icons {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .edit-icon-btn {
+          background: transparent;
+          border: 0;
+          color: #fff;
+          font-size: 22px;
+          cursor: pointer;
+          padding: 4px;
+          display: grid;
+          place-items: center;
+          opacity: 0.85;
+          transition: opacity 0.2s;
+        }
+
+        .edit-icon-btn:hover {
+          opacity: 1;
+        }
+
+        .edit-close {
+          background: transparent;
+          border: 0;
+          color: #fff;
+          font-size: 22px;
+          cursor: pointer;
+          padding: 4px;
+          display: grid;
+          place-items: center;
+        }
+
+        .edit-close:hover {
+          opacity: 0.8;
+        }
+
+        .edit-error {
+          background: rgba(220, 38, 38, 0.08);
+          color: #b91c1c;
+          border: 1px solid rgba(220, 38, 38, 0.2);
+          border-radius: 8px;
+          padding: 12px 16px;
+          margin: 16px 20px 0;
+          font-size: 14px;
+        }
+
+        .edit-body {
+          padding: 20px;
+          background: #fff;
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        .edit-image-container {
+          width: 100%;
+          margin-bottom: 20px;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .edit-recipe-image {
+          width: 100%;
+          height: auto;
+          display: block;
+          max-height: 250px;
+          object-fit: cover;
+        }
+
+        .edit-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+
+        .edit-column {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .edit-section {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .edit-section-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #0f2a3f;
+          margin: 0;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #e5e5e5;
+        }
+
+        .edit-field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .edit-field label {
+          font-weight: 600;
+          font-size: 13px;
+          color: #0f2a3f;
+        }
+
+        .edit-field input,
+        .edit-field textarea {
+          border: 1.5px solid rgba(0, 0, 0, 0.2);
+          border-radius: 8px;
+          padding: 10px 12px;
+          font-size: 14px;
+          font-family: inherit;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        .edit-field input:focus,
+        .edit-field textarea:focus {
+          border-color: var(--orange);
+        }
+
+        /* Ingredients list */
+        .ingredients-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .ingredient-row {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 8px;
+        }
+
+        .ingredient-input,
+        .ingredient-measure {
+          border: 1.5px solid rgba(0, 0, 0, 0.15);
+          border-radius: 12px;
+          padding: 10px 12px;
+          font-size: 14px;
+          font-family: inherit;
+          outline: none;
+          transition: all 0.2s;
+          background: #f9f9f9;
+        }
+
+        .ingredient-input:focus,
+        .ingredient-measure:focus {
+          border-color: var(--orange);
+          background: #fff;
+        }
+
+        .youtube-input {
+          border: 1.5px solid rgba(0, 0, 0, 0.15);
+          border-radius: 12px;
+          padding: 10px 12px;
+          font-size: 14px;
+          font-family: inherit;
+          outline: none;
+          transition: border-color 0.2s;
+          background: #f9f9f9;
+          width: 100%;
+        }
+
+        .youtube-input:focus {
+          border-color: var(--orange);
+          background: #fff;
+        }
+
+        /* Instructions textarea */
+        .instructions-textarea {
+          border: 1.5px solid rgba(0, 0, 0, 0.15);
+          border-radius: 12px;
+          padding: 12px;
+          font-size: 14px;
+          font-family: inherit;
+          outline: none;
+          resize: vertical;
+          min-height: 280px;
+          transition: border-color 0.2s;
+          background: #f9f9f9;
+        }
+
+        .instructions-textarea:focus {
+          border-color: var(--orange);
+          background: #fff;
+        }
+
+        .edit-actions {
+          display: flex;
+          gap: 10px;
+          padding: 16px 20px;
+          border-top: 1px solid #e5e5e5;
+          background: #f9f9f9;
+          justify-content: flex-end;
+          flex-shrink: 0;
+        }
+
+        .edit-cancel,
+        .edit-save {
+          padding: 10px 20px;
+          border: 0;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+        }
+
+        .edit-cancel {
+          background: #e5e5e5;
+          color: #0f2a3f;
+        }
+
+        .edit-cancel:hover:not(:disabled) {
+          background: #d0d0d0;
+        }
+
+        .edit-save {
+          background: var(--orange);
+          color: #fff;
+        }
+
+        .edit-save:hover:not(:disabled) {
+          background: #a03c02;
+        }
+
+        .edit-cancel:disabled,
+        .edit-save:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .edit-card {
+            width: 95vw;
+            max-height: 95vh;
+          }
+
+          .edit-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          .instructions-textarea {
+            min-height: 200px;
+          }
+
+          .edit-body {
+            padding: 16px;
+          }
+        }
+
         /* Pagination container */
         .r-pager {
         display: flex;

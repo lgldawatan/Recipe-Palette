@@ -41,6 +41,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   const [status, setStatus] = useState("idle");
   const [errMsg, setErrMsg] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [customRecipes, setCustomRecipes] = useState({});
 
   // Filter modal controls and options
   const [isOpen, setIsOpen] = useState(false);
@@ -196,10 +197,73 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   }, [API, j, LABEL_ALL]);
 
+  // Fetch custom recipes from Firestore
+  const loadCustomRecipes = useCallback(async () => {
+    try {
+      // Use the Next.js API base URL from env
+      const apiBase = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+      const apiUrl = apiBase + "/api/recipes/custom?t=" + Date.now();
+      console.log("Fetching from:", apiUrl);
+      
+      const res = await fetch(apiUrl);
+      if (!res.ok) {
+        console.error("Failed to fetch custom recipes, status:", res.status);
+        return;
+      }
+      const data = await res.json();
+      console.log("Loaded custom recipes - count:", Object.keys(data.recipes || {}).length, "IDs:", Object.keys(data.recipes || {}));
+      setCustomRecipes(data.recipes || {});
+    } catch (err) {
+      console.error("Failed to load custom recipes:", err);
+    }
+  }, []);
+
+  // Convert custom recipe ingredients to MealDB format
+  const convertCustomRecipeFormat = useCallback((recipe) => {
+    if (!recipe) return recipe;
+    
+    // If ingredients are in array format, convert to MealDB format
+    if (Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
+      const converted = { ...recipe };
+      recipe.ingredients.forEach((ing, i) => {
+        const index = i + 1;
+        converted[`strIngredient${index}`] = ing.name || "";
+        converted[`strMeasure${index}`] = ing.measure || "";
+      });
+      // Clear remaining ingredient slots
+      for (let i = recipe.ingredients.length + 1; i <= 20; i++) {
+        converted[`strIngredient${i}`] = "";
+        converted[`strMeasure${i}`] = "";
+      }
+      return converted;
+    }
+    return recipe;
+  }, []);
+
+  // Merge custom recipes with MealDB recipes
+  const mergeRecipesWithCustom = useCallback((meals) => {
+    return meals.map((meal) => {
+      const custom = customRecipes[meal.idMeal];
+      if (custom) {
+        console.log(`Found custom data for ${meal.idMeal}, merging...`, custom);
+        const converted = convertCustomRecipeFormat(custom);
+        const merged = { ...meal, ...converted };
+        console.log(`After merge:`, merged.strMeal, merged.strCategory, merged.strArea);
+        return merged;
+      }
+      return meal;
+    });
+  }, [customRecipes, convertCustomRecipeFormat]);
+
+  // Refresh custom recipes (useful after editing)
+  const refreshCustomRecipes = useCallback(async () => {
+    await loadCustomRecipes();
+  }, [loadCustomRecipes]);
 
   useEffect(() => {
     (async () => {
       await loadAll();
+      await loadCustomRecipes();
 
       try {
         const cats = await j(`${API}/list.php?c=list`);
@@ -211,8 +275,16 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         setAreas((ars.meals || []).map(x => x.strArea).sort());
       } catch { }
     })();
-  }, [loadAll, j]);
+  }, [loadAll, loadCustomRecipes, j]);
 
+  // Refresh custom recipes every 3 seconds to catch admin edits
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Polling for custom recipe updates...");
+      loadCustomRecipes();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [loadCustomRecipes]);
 
   // ==============================
   // Searching helpers
@@ -556,7 +628,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             )}
 
             {/* Cards list */}
-            {status === "success" && slice.length > 0 && slice.map((m) => (
+            {status === "success" && slice.length > 0 && mergeRecipesWithCustom(slice).map((m) => (
               <article className="r-card" key={m.idMeal}>
                 <div className="r-card__imgwrap">
                   <img className="r-card__img" src={m.strMealThumb} alt={m.strMeal} />
@@ -761,6 +833,15 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
       {/* ========= RECIPE DETAILS MODAL ========= */}
       {detailMeal && (
+        (() => {
+          let mergedMeal = detailMeal;
+          const custom = customRecipes[detailMeal.idMeal];
+          if (custom) {
+            const converted = convertCustomRecipeFormat(custom);
+            mergedMeal = { ...detailMeal, ...converted };
+          }
+
+          return (
         <div
           className="rp-modal is-open recipe-modal"
           aria-hidden="false"
@@ -780,7 +861,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
             <div className="rp-modal__body rmodal">
               {/* dish name */}
-              <h3 id="rmTitle" className="rmodal__name">{detailMeal.strMeal}</h3>
+              <h3 id="rmTitle" className="rmodal__name">{mergedMeal.strMeal}</h3>
 
               {/* INGREDIENTS */}
               <div className="rmodal__section">
@@ -788,7 +869,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
                 {/* simple cards (no image) */}
                 <div className="rmodal__chips rmodal__chips--grid">
-                  {ingredientItems(detailMeal).map((it, i) => (
+                  {ingredientItems(mergedMeal).map((it, i) => (
                     <figure key={i} className="ing ing--card">
                       <img
                         src={it.imgSmall}
@@ -813,13 +894,13 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
               <div className="rmodal__section">
                 <h4 className="rmodal__label">Instructions</h4>
                 <ul className="rmodal__steps">
-                  {stepsFromText(detailMeal.strInstructions).map((s, i) => <li key={i}>{s}</li>)}
+                  {stepsFromText(mergedMeal.strInstructions).map((s, i) => <li key={i}>{s}</li>)}
                 </ul>
 
-                {detailMeal.strYoutube && (
+                {mergedMeal.strYoutube && (
                   <a
                     className="rmodal__yt rmodal__yt--solo"
-                    href={detailMeal.strYoutube}
+                    href={mergedMeal.strYoutube}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -830,6 +911,8 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             </div>
           </div>
         </div>
+          );
+        })()
       )}
     </>
   );
