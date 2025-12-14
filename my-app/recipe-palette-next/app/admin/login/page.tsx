@@ -11,36 +11,46 @@ export default function AdminLoginPage() {
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setErrorMsg("");
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-        if (!username.trim() || !password.trim()) {
-            setErrorMsg("Please enter both username and password.");
-            return;
-        }
+  if (isLoading) return; // PREVENT DOUBLE SUBMIT
 
-        try {
-            const res = await fetch("/api/admin/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
-            });
+  setErrorMsg("");
+  setIsLoading(true);
 
-            const data = await res.json();
+  if (!username.trim() || !password.trim()) {
+    setErrorMsg("Please enter both username and password.");
+    setIsLoading(false);
+    return;
+  }
 
-            if (!res.ok) {
-                setErrorMsg(data.message || "Invalid username or password.");
-                return;
-            }
+  try {
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-            router.push("/admin/recipes");
-        } catch {
-            setErrorMsg("Something went wrong. Please try again.");
-        }
-    };
+    const data = await res.json();
+
+    if (!res.ok) {
+      setErrorMsg(data.message || "Invalid username or password.");
+      setIsLoading(false);
+      return;
+    }
+
+    // SUCCESS — redirect ONCE
+    router.push("/admin/recipes");
+
+  } catch {
+    setErrorMsg("Something went wrong. Please try again.");
+    setIsLoading(false);
+  }
+};
 
 
 
