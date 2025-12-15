@@ -2018,6 +2018,12 @@ export default function AdminRecipesPage() {
   cursor: pointer;
 }
 
+/* Ensure header styling is consistent */
+.rp-shell {
+  border-radius: 9999px;
+  max-width: 1289px;
+}
+
 @media (max-width: 768px) {
   .rp-nav {
     display: none;

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function AdminLayout({
   children,
@@ -10,6 +10,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [openProfile, setOpenProfile] = useState(false);
   const profileWrapRef = useRef<HTMLDivElement | null>(null);
   const [openMobileNav, setOpenMobileNav] = useState(false);
@@ -36,7 +37,7 @@ export default function AdminLayout({
   }, []);
 
   const isActive = (path: string) => {
-    return typeof window !== "undefined" && window.location.pathname === path;
+    return pathname === path || pathname.startsWith(path + "/");
   };
 
   const handleLogout = async () => {
@@ -230,6 +231,10 @@ export default function AdminLayout({
       </main>
 
       <style jsx>{`
+        body {
+          font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+
         .rp-layout-wrapper {
           min-height: 100vh;
           background-color: #f5f5f5;
@@ -298,6 +303,8 @@ export default function AdminLayout({
           font-size: 17px;
           color: #183f4e;
           padding: 6px 10px;
+          font-family: "Poppins", system-ui, sans-serif;
+          font-weight: 500;
         }
 
         .rp-link--active {

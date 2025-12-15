@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
+import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import "./About.css";
@@ -20,6 +21,16 @@ export default function About({ user }) {
   const [showLoginWarn, setShowLoginWarn] = useState(false);
   const scrollLockY = useRef(0);
 
+  // About content state
+  const [aboutContent, setAboutContent] = useState({
+    aboutUsText: "At recipe palette., we believe cooking is more than just making meals. It's an art form. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
+    ourStoryText: "Recipe Palette was born from the love of food and the belief that every kitchen can be a place of creativity. We wanted to create a space where flavors come together, cultures meet, and everyday meals are transformed into vibrant experiences. Whether you're a beginner in the kitchen or a seasoned cook, our platform is designed to inspire, guide, and celebrate your journey.",
+    ourMissionText: "Our mission is to inspire home cooks and food lovers to explore diverse recipes, discover vibrant flavors, and transform simple ingredients into extraordinary dishes. At Recipe Palette, we believe that cooking brings joy, creativity, and connection into everyday life.",
+    whatWeOfferText: "Global Recipes – Discover dishes from around the world.\n\nCreative Cooking – Transform everyday meals into colorful creations.\n\nSave Favorites – Log in to build your own personal flavor palette.\n\nStep-by-Step Guides – Clear instructions for beginners and experts alike.",
+    ourValuesText: "Creativity – Cooking is a canvas for self-expression.\n\nCommunity – Food tastes better when it's shared.\n\nDiversity – Every culture brings flavors worth celebrating.",
+    joinUsText: "At Recipe Palette, we celebrate the joy of food and the art of flavor. Explore new dishes, create your own, and share the stories behind every meal. Because every recipe adds color to your journey — and together, they create a palette worth savoring.",
+  });
+
   const isAuthed = Boolean(user?.uid);
   const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
@@ -36,6 +47,45 @@ export default function About({ user }) {
       setShowLoginWarn(true);
     }
   };
+
+  // Set up Firestore listener for about content
+  useEffect(() => {
+    try {
+      const db = getFirestore();
+      const docRef = doc(db, "config", "aboutContent");
+      
+      console.log("Setting up Firestore listener for aboutContent...");
+      
+      const unsubscribe = onSnapshot(
+        docRef,
+        (docSnap) => {
+          console.log("Firestore listener triggered");
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log("About content updated from Firestore:", data);
+            setAboutContent((prev) => {
+              const updated = { ...prev, ...data };
+              console.log("Updated state:", updated);
+              return updated;
+            });
+          } else {
+            console.log("About content document does not exist in Firestore");
+          }
+        },
+        (error) => {
+          console.error("Error listening to about content:", error);
+        }
+      );
+
+      console.log("Firestore listener attached, unsubscribe function ready");
+      return () => {
+        console.log("Cleaning up Firestore listener");
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Error setting up Firestore listener:", error);
+    }
+  }, []);
 
   /* === Body scroll lock while modal OR menu is open === */
   useEffect(() => {
@@ -195,9 +245,7 @@ export default function About({ user }) {
               <article className="about-card" role="region" aria-label="About Us">
                 <h2>About Us</h2>
                 <p>
-                  At <strong>recipe palette.</strong>, we believe cooking is more than just making meals.
-                  It’s an art form. Like colors on a canvas, every ingredient adds depth, flavor,
-                  and creativity to your kitchen.
+                  At <strong>recipe palette.</strong>, {aboutContent.aboutUsText.replace("At recipe palette., ", "")}
                 </p>
               </article>
             </div>
@@ -208,37 +256,28 @@ export default function About({ user }) {
             <div className="info-grid">
               <article className="info-card info--navy">
                 <h3>Our Story</h3>
-                <p>
-                  Recipe Palette was born from the love of food and the belief that every kitchen
-                  can be a place of creativity. We wanted to create a space where flavors come
-                  together, cultures meet, and everyday meals are transformed into vibrant
-                  experiences. Whether you’re a beginner in the kitchen or a seasoned cook,
-                  our platform is designed to inspire, guide, and celebrate your journey.
-                </p>
+                <p>{aboutContent.ourStoryText}</p>
               </article>
-
+              
               <article className="info-card info--gold">
                 <h3>Our Mission</h3>
-                <p>
-                  Our mission is to inspire home cooks and food lovers to explore diverse recipes,
-                  discover vibrant flavors, and transform simple ingredients into extraordinary dishes.
-                  At Recipe Palette, we believe that cooking brings joy, creativity, and connection into everyday life.
-                </p>
+                <p>{aboutContent.ourMissionText}</p>
               </article>
 
               <article className="info-card info--orange span-2">
                 <h3>What We Offer</h3>
-                <p><strong>Global Recipes</strong> – Discover dishes from around the world.</p>
-                <p><strong>Creative Cooking</strong> – Transform everyday meals into colorful creations.</p>
-                <p><strong>Save Favorites</strong> – Log in to build your own personal flavor palette.</p>
-                <p><strong>Step-by-Step Guides</strong> – Clear instructions for beginners and experts alike.</p>
+                {aboutContent.whatWeOfferText.split("\n\n").map((item, index) => {
+                  const [bold, rest] = item.split(" – ");
+                  return <p key={index}><strong>{bold}</strong> – {rest}</p>;
+                })}
               </article>
 
               <article className="info-card info--teal span-2">
                 <h3>Our Values</h3>
-                <p><strong>Creativity</strong> – Cooking is a canvas for self-expression.</p>
-                <p><strong>Community</strong> – Food tastes better when it’s shared.</p>
-                <p><strong>Diversity</strong> – Every culture brings flavors worth celebrating.</p>
+                {aboutContent.ourValuesText.split("\n\n").map((item, index) => {
+                  const [bold, rest] = item.split(" – ");
+                  return <p key={index}><strong>{bold}</strong> – {rest}</p>;
+                })}
               </article>
             </div>
           </section>
@@ -248,11 +287,7 @@ export default function About({ user }) {
             <img className="about-cta__img" src={aboutBanner2} alt="Colorful dishes background" />
             <article className="about-ctaCard" role="region" aria-label="Join Us">
               <h3>Join Us</h3>
-              <p>
-                At Recipe Palette, we celebrate the joy of food and the art of flavor.
-                Explore new dishes, create your own, and share the stories behind every meal.
-                Because every recipe adds color to your journey — and together, they create a palette worth savoring.
-              </p>
+              <p>{aboutContent.joinUsText}</p>
             </article>
           </section>
         </main>
