@@ -61,7 +61,7 @@ export default function AdminLayout({
       />
 
       {/* Header */}
-      <header className="rp-header">
+      {pathname !== "/admin/login" && <header className="rp-header">
         <div className="rp-shell">
           {/* LEFT: logo + wordmark */}
           <button
@@ -144,6 +144,7 @@ export default function AdminLayout({
           </button>
         </div>
       </header>
+      }
 
       {/* Mobile Nav Overlay */}
       {openMobileNav && (

@@ -941,7 +941,7 @@ export default function AdminRecipesPage() {
                                             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", maxHeight: "500px", overflowY: "auto", paddingRight: "8px" }}>
                                                 {(editFormData.ingredients || []).map((ing: any, i: number) => {
                                                     return (
-                                                        <div key={i} style={{ position: "relative", display: "flex", flexDirection: "column", gap: "8px", padding: "12px", border: "1px solid #ddd", borderRadius: "8px", backgroundColor: "#fff" }}>
+                                                        <div key={i} style={{ position: "relative", display: "flex", flexDirection: "column", gap: "0", padding: "0", border: "1px solid #ddd", borderRadius: "12px", backgroundColor: "#fff", overflow: "hidden" }}>
                                                             <button
                                                                 type="button"
                                                                 onClick={() => {
@@ -967,12 +967,12 @@ export default function AdminRecipesPage() {
                                                             >
                                                                 <i className="bi bi-trash" style={{ fontSize: "14px" }} />
                                                             </button>
-                                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80px" }}>
+                                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80px", background: "#f9f9f9", padding: "12px" }}>
                                                                 {ing.image ? (
                                                                     <img
                                                                         src={ing.image}
                                                                         alt={ing.name || "Ingredient"}
-                                                                        style={{ maxWidth: "70px", maxHeight: "70px", objectFit: "contain" }}
+                                                                        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
                                                                     />
                                                                 ) : (
                                                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: "32px" }}>
@@ -985,14 +985,14 @@ export default function AdminRecipesPage() {
                                                                 placeholder="Ingredient Name"
                                                                 value={ing.name || ""}
                                                                 onChange={(e) => updateIngredient(i, "name", e.target.value)}
-                                                                style={{ width: "100%", padding: "6px 8px", border: "none", fontSize: "14px", fontWeight: "600", outline: "none", textAlign: "center" }}
+                                                                style={{ width: "100%", padding: "8px", border: "none", fontSize: "14px", fontWeight: "600", outline: "none", textAlign: "center" }}
                                                             />
                                                             <input
                                                                 type="text"
                                                                 placeholder="Measure"
                                                                 value={ing.measure || ""}
                                                                 onChange={(e) => updateIngredient(i, "measure", e.target.value)}
-                                                                style={{ width: "100%", padding: "6px 8px", border: "none", fontSize: "12px", outline: "none", textAlign: "center", color: "#666" }}
+                                                                style={{ width: "100%", padding: "6px 8px 12px", border: "none", fontSize: "12px", outline: "none", textAlign: "center", color: "#666" }}
                                                             />
                                                         </div>
                                                     );
