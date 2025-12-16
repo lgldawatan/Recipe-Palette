@@ -21,6 +21,7 @@ export default function AdminHomePage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("success");
 
@@ -82,21 +83,11 @@ export default function AdminHomePage() {
       setMessage(`Failed to save content: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setSaving(false);
-      
-      // Auto-close success message after 2 seconds
-      if (messageType === "success") {
-        if (messageTimerRef.current) {
-          clearTimeout(messageTimerRef.current);
-        }
-        messageTimerRef.current = window.setTimeout(() => {
-          setMessage("");
-        }, 2000);
-      }
     }
   };
 
   const handleRestore = async () => {
-    setSaving(true);
+    setRestoring(true);
     try {
       // Save default content to Firestore
       const res = await fetch("/api/admin/home", {
@@ -125,7 +116,7 @@ export default function AdminHomePage() {
       setMessageType("error");
       setMessage(`Failed to restore content: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
-      setSaving(false);
+      setRestoring(false);
     }
   };
 
@@ -146,9 +137,9 @@ export default function AdminHomePage() {
           <button
             className="rp-btn-restore"
             onClick={handleRestore}
-            disabled={saving}
+            disabled={restoring}
           >
-            {saving ? "Restoring..." : "Restore"}
+            {restoring ? "Restoring..." : "Restore"}
           </button>
           <button
             className="rp-btn-primary"

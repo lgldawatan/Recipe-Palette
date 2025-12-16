@@ -342,6 +342,7 @@ export default function AdminRecipesPage() {
     const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
     const [editFormData, setEditFormData] = useState<Meal | null>(null);
     const [editLoading, setEditLoading] = useState(false);
+    const [restoreLoading, setRestoreLoading] = useState(false);
     const [editErr, setEditErr] = useState("");
     const [editSuccess, setEditSuccess] = useState(false);
     const [restoreSuccess, setRestoreSuccess] = useState(false);
@@ -399,6 +400,8 @@ export default function AdminRecipesPage() {
             return;
         }
         
+        setRestoreLoading(true);
+        
         // Convert ingredients back from PRISTINE ORIGINAL meal data
         const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
         for (let i = 1; i <= 20; i++) {
@@ -427,6 +430,7 @@ export default function AdminRecipesPage() {
         setEditFormData(formData);
         setEditErr("");
         setRestoreSuccess(true);
+        setRestoreLoading(false);
         
         // Auto-close after 2 seconds
         if (restoreSuccessTimerRef.current) {
@@ -1034,10 +1038,11 @@ export default function AdminRecipesPage() {
                                     type="button"
                                     className="edit-restore"
                                     onClick={restoreOriginalRecipe}
+                                    disabled={restoreLoading}
                                     title="Restore original recipe details"
                                     style={{ marginRight: "auto" }}
                                 >
-                                    Restore
+                                    {restoreLoading ? "Restoring..." : "Restore"}
                                 </button>
                                 <button
                                     type="button"
