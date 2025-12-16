@@ -268,30 +268,30 @@ export default function AdminAboutPage() {
         .rp-btn-restore {
           padding: 0.75rem 1.5rem;
           font-size: 1rem;
-          font-weight: 500;
+          font-weight: 600;
           border: none;
-          border-radius: 0.5rem;
+          border-radius: 6px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: background-color 0.3s;
           font-family: Poppins, system-ui, sans-serif;
         }
 
         .rp-btn-primary {
-          background-color: #4299e1;
+          background-color: #d97706;
           color: white;
         }
 
         .rp-btn-primary:hover:not(:disabled) {
-          background-color: #3182ce;
+          background-color: #b85e00;
         }
 
         .rp-btn-restore {
-          background-color: #edf2f7;
-          color: #2d3748;
+          background-color: #4CAF50;
+          color: white;
         }
 
         .rp-btn-restore:hover:not(:disabled) {
-          background-color: #e2e8f0;
+          background-color: #45a049;
         }
 
         .rp-btn-primary:disabled,
@@ -390,7 +390,7 @@ interface EditSectionProps {
 function EditSection({ title, text, onTextChange, isMultiline }: EditSectionProps) {
   return (
     <div className="edit-section">
-      <label className="edit-section__label">{title}</label>
+      <h3 className="edit-section__title">{title}</h3>
       <textarea
         className="edit-section__input"
         value={text}
@@ -401,24 +401,33 @@ function EditSection({ title, text, onTextChange, isMultiline }: EditSectionProp
         .edit-section {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 1rem;
+          background-color: white;
+          padding: 2rem;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .edit-section__label {
-          font-size: 0.875rem;
+        .edit-section__title {
+          margin: 0;
+          font-size: 1.25rem;
           font-weight: 600;
-          color: #2d3748;
+          color: #1f2937;
           font-family: Poppins, system-ui, sans-serif;
         }
 
         .edit-section__input {
-          padding: 0.75rem;
-          border: 1px solid #cbd5e0;
-          border-radius: 0.375rem;
-          font-size: 0.9375rem;
-          font-family: Poppins, system-ui, sans-serif;
+          padding: 1rem;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          font-size: 0.95rem;
+          font-family: inherit;
           color: #1a202c;
           resize: vertical;
+        }
+
+        .edit-section__input::placeholder {
+          color: #9ca3af;
         }
 
         .edit-section__input:focus {

@@ -26,9 +26,10 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
      ================================ */
   const [managedContent, setManagedContent] = useState({
     bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
-    aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
     addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
   });
+
+  const [aboutUsText, setAboutUsText] = useState("At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.");
 
   // Fetch managed home content with real-time listener
   useEffect(() => {
@@ -37,7 +38,6 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
 
     const defaultContent = {
       bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
-      aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
       addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
     };
 
@@ -73,6 +73,28 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
       console.log("Cleaning up Firestore listener");
       unsubscribe();
     };
+  }, []);
+
+  // Fetch about us text from aboutContent document
+  useEffect(() => {
+    const db = getFirestore();
+    const docRef = doc(db, "config", "aboutContent");
+
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          console.log("About us text updated:", data.aboutUsText);
+          setAboutUsText(data.aboutUsText || "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.");
+        }
+      },
+      (error) => {
+        console.error("Error fetching about us text:", error);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   async function handleLogout() {
@@ -364,7 +386,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           <div className="about__card">
             <h2>About Us</h2>
             <p>
-              {managedContent.aboutUsText}
+              {aboutUsText}
             </p>
             <Link to="/about" className="btn-about">Learn More</Link>
           </div>

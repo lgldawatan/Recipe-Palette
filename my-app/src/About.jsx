@@ -245,7 +245,7 @@ export default function About({ user }) {
               <article className="about-card" role="region" aria-label="About Us">
                 <h2>About Us</h2>
                 <p>
-                  At <strong>recipe palette.</strong>, {aboutContent.aboutUsText.replace("At recipe palette., ", "")}
+                  {aboutContent.aboutUsText}
                 </p>
               </article>
             </div>
