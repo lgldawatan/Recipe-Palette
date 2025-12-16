@@ -20,8 +20,8 @@ export default function AdminHomePage() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [restoring, setRestoring] = useState(false);
+  const [savingFields, setSavingFields] = useState<Set<keyof HomeContent>>(new Set());
+  const [restoringFields, setRestoringFields] = useState<Set<keyof HomeContent>>(new Set());
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("success");
 
@@ -59,50 +59,51 @@ export default function AdminHomePage() {
     setContent((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSaveField = async (field: keyof HomeContent) => {
+    setSavingFields((prev) => new Set(prev).add(field));
     try {
-      console.log("Saving content:", content);
+      const dataToSave = { [field]: content[field] };
       const res = await fetch("/api/admin/home", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(content),
+        body: JSON.stringify(dataToSave),
       });
 
-      const responseData = await res.json();
-      console.log("Save response:", responseData);
-
       if (!res.ok) {
-        throw new Error(responseData.error || "Save failed");
+        throw new Error("Save failed");
       }
       setMessageType("success");
-      setMessage("Home content saved successfully!");
+      setMessage(`${field} saved successfully!`);
     } catch (error) {
       console.error("Save error:", error);
       setMessageType("error");
-      setMessage(`Failed to save content: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setMessage(`Failed to save ${field}`);
     } finally {
-      setSaving(false);
+      setSavingFields((prev) => {
+        const next = new Set(prev);
+        next.delete(field);
+        return next;
+      });
     }
   };
 
-  const handleRestore = async () => {
-    setRestoring(true);
+  const handleRestoreField = async (field: keyof HomeContent) => {
+    setRestoringFields((prev) => new Set(prev).add(field));
     try {
-      // Save default content to Firestore
+      const dataToSave = { [field]: defaultContent[field] };
       const res = await fetch("/api/admin/home", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(defaultContent),
+        body: JSON.stringify(dataToSave),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to restore content");
+        throw new Error("Failed to restore");
       }
 
-      setContent(defaultContent);
+      setContent((prev) => ({ ...prev, [field]: defaultContent[field] }));
       setMessageType("success");
-      setMessage("Content restored to defaults");
+      setMessage(`${field} restored to defaults`);
       
       // Auto-close after 2 seconds
       if (messageTimerRef.current) {
@@ -114,9 +115,13 @@ export default function AdminHomePage() {
     } catch (error) {
       console.error("Restore error:", error);
       setMessageType("error");
-      setMessage(`Failed to restore content: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setMessage(`Failed to restore ${field}`);
     } finally {
-      setRestoring(false);
+      setRestoringFields((prev) => {
+        const next = new Set(prev);
+        next.delete(field);
+        return next;
+      });
     }
   };
 
@@ -133,22 +138,6 @@ export default function AdminHomePage() {
       {/* Page Header */}
       <div className="rp-admin-page-header">
         <h1>Manage Home Page Content</h1>
-        <div style={{ display: "flex", gap: "0.75rem" }}>
-          <button
-            className="rp-btn-restore"
-            onClick={handleRestore}
-            disabled={restoring}
-          >
-            {restoring ? "Restoring..." : "Restore"}
-          </button>
-          <button
-            className="rp-btn-primary"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
       </div>
 
       {/* Success Dialog */}
@@ -181,22 +170,37 @@ export default function AdminHomePage() {
         {/* Banner Section */}
         <EditSection
           title="Banner Text"
+          fieldName="bannerText"
           text={content.bannerText}
           onTextChange={(text) => handleTextChange("bannerText", text)}
+          onSave={() => handleSaveField("bannerText")}
+          onRestore={() => handleRestoreField("bannerText")}
+          isSaving={savingFields.has("bannerText")}
+          isRestoring={restoringFields.has("bannerText")}
         />
 
         {/* About Us Section */}
         <EditSection
           title="About Us Text"
+          fieldName="aboutUsText"
           text={content.aboutUsText}
           onTextChange={(text) => handleTextChange("aboutUsText", text)}
+          onSave={() => handleSaveField("aboutUsText")}
+          onRestore={() => handleRestoreField("aboutUsText")}
+          isSaving={savingFields.has("aboutUsText")}
+          isRestoring={restoringFields.has("aboutUsText")}
         />
 
         {/* Add to Favorites Section */}
         <EditSection
           title="Add To Favorites Text"
+          fieldName="addToFavoritesText"
           text={content.addToFavoritesText}
           onTextChange={(text) => handleTextChange("addToFavoritesText", text)}
+          onSave={() => handleSaveField("addToFavoritesText")}
+          onRestore={() => handleRestoreField("addToFavoritesText")}
+          isSaving={savingFields.has("addToFavoritesText")}
+          isRestoring={restoringFields.has("addToFavoritesText")}
         />
       </div>
 
@@ -355,14 +359,24 @@ export default function AdminHomePage() {
 // Edit Section Component
 interface EditSectionProps {
   title: string;
+  fieldName?: string;
   text: string;
   onTextChange: (text: string) => void;
+  onSave?: () => void;
+  onRestore?: () => void;
+  isSaving?: boolean;
+  isRestoring?: boolean;
 }
 
 function EditSection({
   title,
+  fieldName,
   text,
   onTextChange,
+  onSave,
+  onRestore,
+  isSaving = false,
+  isRestoring = false,
 }: EditSectionProps) {
   return (
     <div className="rp-edit-section">
@@ -378,11 +392,23 @@ function EditSection({
           font-family: "Poppins", system-ui, -apple-system, sans-serif;
         }
 
+        .rp-section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+        }
+
         .rp-section-title {
           margin: 0;
           font-size: 1.25rem;
           font-weight: 600;
           color: #1f2937;
+        }
+
+        .rp-section-actions {
+          display: flex;
+          gap: 0.75rem;
         }
 
         .rp-section-textarea {
@@ -400,9 +426,63 @@ function EditSection({
         .rp-section-textarea::placeholder {
           color: #9ca3af;
         }
+
+        .rp-section-btn {
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 600;
+          transition: background-color 0.3s;
+          white-space: nowrap;
+        }
+
+        .rp-section-btn-save {
+          background-color: #d97706;
+          color: white;
+        }
+
+        .rp-section-btn-save:hover:not(:disabled) {
+          background-color: #b85e00;
+        }
+
+        .rp-section-btn-restore {
+          background-color: #4CAF50;
+          color: white;
+        }
+
+        .rp-section-btn-restore:hover:not(:disabled) {
+          background-color: #388e3c;
+        }
+
+        .rp-section-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
       `}</style>
 
-      <h3 className="rp-section-title">{title}</h3>
+      <div className="rp-section-header">
+        <h3 className="rp-section-title">{title}</h3>
+        {onSave && onRestore && (
+          <div className="rp-section-actions">
+            <button
+              className="rp-section-btn rp-section-btn-restore"
+              onClick={onRestore}
+              disabled={isRestoring}
+            >
+              {isRestoring ? "Restoring..." : "Restore"}
+            </button>
+            <button
+              className="rp-section-btn rp-section-btn-save"
+              onClick={onSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        )}
+      </div>
       <textarea
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
