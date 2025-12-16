@@ -245,14 +245,15 @@ export default function AdminAboutPage() {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 2rem;
+          gap: 1rem;
           padding: 0 2rem;
         }
 
         .rp-admin-page-header h1 {
-          font-size: 1.875rem;
-          font-weight: 600;
           margin: 0;
-          color: #1a202c;
+          font-size: 2rem;
+          font-weight: 700;
+          color: #1f2937;
           font-family: Poppins, system-ui, sans-serif;
         }
 

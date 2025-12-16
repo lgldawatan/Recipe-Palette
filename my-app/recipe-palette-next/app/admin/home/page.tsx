@@ -220,6 +220,7 @@ export default function AdminHomePage() {
           align-items: center;
           margin-bottom: 2rem;
           gap: 1rem;
+          padding: 0 2rem;
         }
 
         .rp-admin-page-header h1 {
@@ -301,6 +302,8 @@ export default function AdminHomePage() {
           display: flex;
           flex-direction: column;
           gap: 2rem;
+          padding: 0 2rem 2rem 2rem;
+          max-width: 1400px;
         }
 
         .rp-modal {

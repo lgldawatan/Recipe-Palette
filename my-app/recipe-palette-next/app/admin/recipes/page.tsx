@@ -562,45 +562,47 @@ export default function AdminRecipesPage() {
                 rel="stylesheet"
             />
 
+            {/* ====== PAGE HEADER ====== */}
+            <div className="rp-admin-page-header">
+                <h1>Manage Recipe Content</h1>
+                <form
+                    className="hero-search"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        runSearch(q);
+                    }}
+                >
+                    <div className="search-box">
+                        <i className="bi bi-search" aria-hidden="true" />
+                        <input
+                            type="search"
+                            name="q"
+                            placeholder="Search by dish, ingredient, …"
+                            value={q}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                setQ(v);
+                                if (v.trim() === "") runSearch("");
+                            }}
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        className="filter-btn"
+                        onClick={() => {
+                            setIsOpen(true);
+                            document.body.classList.add("rp-noscroll");
+                        }}
+                        aria-label="Open filters"
+                    >
+                        <i className="bi bi-sliders2-vertical" aria-hidden="true" />
+                    </button>
+                </form>
+            </div>
+
             {/* ====== MAIN ====== */}
             <main className="page recipes-page">
-                <section className="hero-search-only">
-                    <form
-                        className="hero-search"
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            runSearch(q);
-                        }}
-                    >
-                        <div className="search-box">
-                            <i className="bi bi-search" aria-hidden="true" />
-                            <input
-                                type="search"
-                                name="q"
-                                placeholder="Search by dish, ingredient, …"
-                                value={q}
-                                onChange={(e) => {
-                                    const v = e.target.value;
-                                    setQ(v);
-                                    if (v.trim() === "") runSearch("");
-                                }}
-                            />
-                        </div>
-
-                        <button
-                            type="button"
-                            className="filter-btn"
-                            onClick={() => {
-                                setIsOpen(true);
-                                document.body.classList.add("rp-noscroll");
-                            }}
-                            aria-label="Open filters"
-                        >
-                            <i className="bi bi-sliders2-vertical" aria-hidden="true" />
-                        </button>
-                    </form>
-                </section>
-
                 <section className="r-list">
                     <div className="r-bar" ref={barRef}>
                         <div className="r-crumbs" ref={crumbsRef}>
@@ -1096,6 +1098,23 @@ export default function AdminRecipesPage() {
           color: #0f2a3f;
            font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         }
+
+        .rp-admin-page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          gap: 1rem;
+          padding: 0 2rem;
+        }
+
+        .rp-admin-page-header h1 {
+          margin: 0;
+          font-size: 2rem;
+          font-weight: 700;
+          color: #1f2937;
+        }
+
         .success-card {
         position: fixed;
         left: 50%;
@@ -1122,23 +1141,21 @@ export default function AdminRecipesPage() {
 
         /* PAGE */
         .page {
-          width: 95%;
-          max-width: 1289px;
-          margin: 18px auto 56px;
+          width: 100%;
+          padding: 0 2rem;
+          margin: 18px 0 56px;
         }
 
         /* search row */
         .hero-search-only {
-          margin: 45px auto 8px;
-          display: flex;
-          justify-content: center;
+          display: none;
         }
         .hero-search {
           display: flex;
           gap: 10px;
-          width: 100%;
-          max-width: 520px;
-          justify-content: center;
+          align-items: center;
+          flex: 1;
+          max-width: 500px;
         }
         .search-box {
           flex: 1;
