@@ -148,17 +148,31 @@ export default function AdminLoginPage() {
             {/* STYLES */}
             <style jsx>{`
 
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              overflow-x: hidden;
+            }
+
             * {
         font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         }
 
         .login-page {
           min-height: 100vh;
+          width: 100vw;
           background: url("/Images/banner2.png") center / cover no-repeat;
           display: grid;
           place-items: center;
-          position: relative;
-          padding: 20px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          padding: 0;
+          margin: 0;
+          z-index: 9999;
         }
 
         .overlay {
@@ -176,6 +190,7 @@ export default function AdminLoginPage() {
           border-radius: 28px;
           text-align: center;
           box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+          margin: 20px;
         }
 
         .logo-wrap {
@@ -271,6 +286,7 @@ export default function AdminLoginPage() {
         @media (max-width: 600px) {
           .login-card {
             padding: 32px 22px;
+            margin: 20px;
           }
 
           .title {
