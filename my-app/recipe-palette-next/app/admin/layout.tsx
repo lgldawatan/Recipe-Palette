@@ -110,7 +110,7 @@ export default function AdminLayout({
                   role="menuitem"
                   onClick={() => {
                     setOpenProfile(false);
-                    // TODO: Implement change password modal
+                    router.push("/admin/recipes?openChangePw=1");
                   }}
                 >
                   Change Password
@@ -207,7 +207,7 @@ export default function AdminLayout({
               onClick={() => {
                 setOpenMobileNav(false);
                 document.body.classList.remove("rp-noscroll");
-                // TODO: Implement change password modal
+                router.push("/admin/recipes?openChangePw=1");
               }}
             >
               Change Password

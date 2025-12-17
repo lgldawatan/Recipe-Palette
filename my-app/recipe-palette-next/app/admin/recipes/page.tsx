@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +10,7 @@ type Meal = Record<string, any>;
 
 export default function AdminRecipesPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const API = "https://www.themealdb.com/api/json/v1/1";
     const LABEL_ALL = "All Recipes";
@@ -288,9 +290,27 @@ export default function AdminRecipesPage() {
 
     // ====== open/close change password modal ======
     const closePwModal = () => {
-        setOpenChangePw(false);
-        document.body.classList.remove("rp-noscroll");
+      setOpenChangePw(false);
+      document.body.classList.remove("rp-noscroll");
+      // remove query param when modal closes
+      try {
+        router.replace("/admin/recipes");
+      } catch (e) {
+        // ignore
+      }
     };
+
+    // open modal if query param is present
+    useEffect(() => {
+      try {
+        if (searchParams?.get("openChangePw") === "1") {
+          setOpenChangePw(true);
+          document.body.classList.add("rp-noscroll");
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, [searchParams]);
 
     // ====== save new password======
     const savePassword = async () => {
