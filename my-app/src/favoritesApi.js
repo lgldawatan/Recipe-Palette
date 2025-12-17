@@ -1,15 +1,22 @@
 const API_BASE =
-  process.env.REACT_APP_API_BASE || "http://localhost:3000";
+  process.env.REACT_APP_API_BASE || "http://localhost:3001";
 
 async function authFetch(user, path, options = {}) {
-  const token = user && (await user.getIdToken());
+  if (!user) throw new Error("Not authenticated");
+
+  const token = await user.getIdToken().catch((e) => {
+    console.error("Failed to get ID token:", e);
+    return null;
+  });
+
+  if (!token) throw new Error("Missing ID token");
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
   });
 

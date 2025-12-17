@@ -36,11 +36,11 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
     }
 
     const exists = isFav(meal.idMeal);
+    const prev = savedRecipes || [];
 
-    setSavedRecipes((prev) =>
-      exists
-        ? prev.filter((x) => x.idMeal !== meal.idMeal)
-        : [...prev, meal]
+    // optimistic update
+    setSavedRecipes((pv) =>
+      exists ? pv.filter((x) => x.idMeal !== meal.idMeal) : [...pv, meal]
     );
 
     try {
@@ -51,6 +51,9 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
       }
     } catch (err) {
       console.error("Failed to update favorite:", err);
+      // revert optimistic update
+      setSavedRecipes(prev);
+      alert("Failed to update favorites. Please try again.");
     }
   };
 
