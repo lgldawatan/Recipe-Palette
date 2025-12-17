@@ -33,12 +33,24 @@ async function getUid(req: NextRequest) {
 
     if (!token) throw new Error("Missing Authorization Bearer token");
 
-    const decoded = await adminAuth.verifyIdToken(token);
-    return { uid: decoded.uid, email: decoded.email || null };
+    try {
+        const decoded = await adminAuth.verifyIdToken(token);
+        console.log("Token verified for uid:", decoded.uid);
+        // include display name and picture when available so we can store them with favorites
+        return {
+            uid: decoded.uid,
+            email: decoded.email || null,
+            name: (decoded.name as string) || null,
+            photo: (decoded.picture as string) || null,
+        };
+    } catch (err: any) {
+        console.error("Token verification failed:", err?.message || err);
+        throw err;
+    }
 }
 
 // ===== Helper: build favorite doc =====
-function buildFavoriteDoc(meal: any, savedBy: string | null) {
+function buildFavoriteDoc(meal: any, savedBy: any /* object with uid,name,email,photo or legacy string */) {
     const idMeal = meal.idMeal;
     const recipeName = meal.strMeal;
     const recipeImage = meal.strMealThumb;
@@ -67,12 +79,23 @@ function buildFavoriteDoc(meal: any, savedBy: string | null) {
 
     const doc: any = {
         idMeal,
-        savedBy,
         recipeName,
         recipeImage,
         ingredients,
         instructions,
     };
+
+    // savedBy may be an object (preferred) or a legacy string (email/uid)
+    if (savedBy && typeof savedBy === "object") {
+        doc.savedBy = {
+            uid: savedBy.uid || null,
+            name: savedBy.name || null,
+            email: savedBy.email || null,
+            photo: savedBy.photo || null,
+        };
+    } else if (savedBy) {
+        doc.savedBy = savedBy;
+    }
 
     const src = (meal.strSource || "").trim();
     if (src) doc.source = src;
@@ -87,12 +110,15 @@ function buildFavoriteDoc(meal: any, savedBy: string | null) {
 export async function GET(req: NextRequest) {
     try {
         const { uid } = await getUid(req);
+        console.log("GET /api/favorites for uid:", uid);
 
         const snap = await adminDb
             .collection("favorites")
             .doc(uid)
             .collection("recipes")
             .get();
+
+        console.log(`Found ${snap.docs.length} favorites for user ${uid}`);
 
         const out = snap.docs.map((d) => {
             const data: any = d.data();
@@ -103,16 +129,22 @@ export async function GET(req: NextRequest) {
                 ? data.instructions
                 : [];
 
+            // normalize savedBy fields for frontend convenience
+            const savedByObj = data.savedBy && typeof data.savedBy === "object" ? data.savedBy : null;
+            const savedByName = savedByObj ? savedByObj.name || null : (typeof data.savedBy === "string" ? data.savedBy : null);
+            const savedByPhoto = savedByObj ? savedByObj.photo || null : null;
+
             return {
                 idMeal: data.idMeal || d.id,
                 savedBy: data.savedBy || null,
+                savedByName,
+                savedByPhoto,
                 recipeName: data.recipeName,
                 recipeImage: data.recipeImage,
                 ingredients,
                 instructions,
                 source: data.source || null,
                 youtube: data.youtube || null,
-
 
                 strMeal: data.recipeName,
                 strMealThumb: data.recipeImage,
@@ -122,7 +154,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json(out, withCors());
     } catch (err: any) {
-        console.error("GET /api/favorites error:", err);
+        console.error("GET /api/favorites error:", err?.message || err);
         return NextResponse.json(
             { error: err.message || "Unauthorized" },
             withCors({ status: 401 })
@@ -143,7 +175,22 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const data = buildFavoriteDoc(meal, email);
+            // include name/photo/email from token so favorites are tied to user's account details
+            const savedBy: { uid: string; name: string | null; email: string | null; photo?: string | null } = {
+                uid,
+                name: null,
+                email: email || null,
+            };
+            // try to get name/photo from token as well
+            const tokenInfo = await adminAuth.getUser(uid).catch(() => null);
+            if (tokenInfo) {
+                savedBy.name = tokenInfo.displayName || null;
+                savedBy.photo = tokenInfo.photoURL || null;
+            }
+
+            const data = buildFavoriteDoc(meal, savedBy);
+
+        console.log(`POST /api/favorites - saving meal ${meal.idMeal} for uid: ${uid}`);
 
         await adminDb
             .collection("favorites")
@@ -152,9 +199,10 @@ export async function POST(req: NextRequest) {
             .doc(meal.idMeal)
             .set(data);
 
+        console.log(`Saved favorite ${meal.idMeal} for user ${uid}`);
         return NextResponse.json({ ok: true }, withCors());
     } catch (err: any) {
-        console.error("POST /api/favorites error:", err);
+        console.error("POST /api/favorites error:", err?.message || err);
         return NextResponse.json(
             { error: err.message || "Failed to save favorite" },
             withCors({ status: 400 })
@@ -175,6 +223,8 @@ export async function DELETE(req: NextRequest) {
             );
         }
 
+        console.log(`DELETE /api/favorites - deleting ${idMeal} for uid: ${uid}`);
+
         await adminDb
             .collection("favorites")
             .doc(uid)
@@ -182,9 +232,10 @@ export async function DELETE(req: NextRequest) {
             .doc(idMeal)
             .delete();
 
+        console.log(`Deleted favorite ${idMeal} for user ${uid}`);
         return NextResponse.json({ ok: true }, withCors());
     } catch (err: any) {
-        console.error("DELETE /api/favorites error:", err);
+        console.error("DELETE /api/favorites error:", err?.message || err);
         return NextResponse.json(
             { error: err.message || "Failed to delete favorite" },
             withCors({ status: 400 })

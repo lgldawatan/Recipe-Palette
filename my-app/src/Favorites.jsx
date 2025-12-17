@@ -472,6 +472,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
                         {ingSummary && (
                           <p className="recipe-card__desc">{ingSummary}</p>
                         )}
+                        {/* saved-by info removed per UX: do not display name/photo on Favorites cards */}
                       </div>
                     </article>
                   );

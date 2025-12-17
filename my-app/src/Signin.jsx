@@ -40,7 +40,10 @@ export default function Signin() {
     setErr("");
     setLoading(true);
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      const provider = new GoogleAuthProvider();
+      // Force account chooser so user can select which Google account to use
+      provider.setCustomParameters({ prompt: "select_account" });
+      await signInWithPopup(auth, provider);
       navigate(next, { replace: true });
     } catch (e) {
       const msg = String(e?.message || e)
