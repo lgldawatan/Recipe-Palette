@@ -19,7 +19,6 @@ export default function AdminRecipesPage() {
     const barRef = useRef<HTMLDivElement | null>(null);
     const crumbsRef = useRef<HTMLDivElement | null>(null);
 
-    // ====== change password modal ======
     const [openChangePw, setOpenChangePw] = useState(false);
     const [newPw, setNewPw] = useState("");
     const [confirmPw, setConfirmPw] = useState("");
@@ -31,7 +30,7 @@ export default function AdminRecipesPage() {
     const [openPwSuccess, setOpenPwSuccess] = useState(false);
     const successTimerRef = useRef<number | null>(null);
 
-    // ====== state ======
+ 
     const [crumbs, setCrumbs] = useState(LABEL_ALL);
     const [full, setFull] = useState<Meal[]>([]);
     const [all, setAll] = useState<Meal[]>([]);
@@ -40,7 +39,7 @@ export default function AdminRecipesPage() {
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [errMsg, setErrMsg] = useState("");
 
-    // filter modal + options
+   
     const [isOpen, setIsOpen] = useState(false);
     const [categories, setCategories] = useState<string[]>([]);
     const [areas, setAreas] = useState<string[]>([]);
@@ -58,7 +57,7 @@ export default function AdminRecipesPage() {
     }
     useEffect(updateCrumbsWidth, [crumbs]);
 
-    // ====== helpers ======
+  
     const dotJoin = (...xs: (string | undefined | null)[]) => xs.filter(Boolean).join(" • ");
 
     const ingredientSummary = (m: Meal, take = 8) => {
@@ -73,7 +72,7 @@ export default function AdminRecipesPage() {
         return items.slice(0, take).join(", ");
     };
 
-    // ====== load all (A-Z) ======
+   
     const loadAll = useCallback(async () => {
         setStatus("loading");
         setErrMsg("");
@@ -147,7 +146,7 @@ export default function AdminRecipesPage() {
         })();
     }, [loadAll, j]);
 
-    // ====== search ======
+ 
     const mergeMeals = (...lists: Meal[][]) => {
         const map = new Map<string, Meal>();
         lists.flat().forEach((m) => {
@@ -203,7 +202,7 @@ export default function AdminRecipesPage() {
         }
     };
 
-    // ====== filters ======
+    // filters 
     const idsFromMeals = (meals: any[]) => (meals || []).map((m) => m.idMeal);
 
     const idsByCategories = async (set: Set<string>) => {
@@ -282,25 +281,22 @@ export default function AdminRecipesPage() {
     }
 
 
-
-    // ====== pagination ======
     const pages = Math.ceil(all.length / PER_PAGE) || 0;
     const start = (page - 1) * PER_PAGE;
     const slice = all.slice(start, start + PER_PAGE);
 
-    // ====== open/close change password modal ======
     const closePwModal = () => {
       setOpenChangePw(false);
       document.body.classList.remove("rp-noscroll");
-      // remove query param when modal closes
+  
       try {
         router.replace("/admin/recipes");
       } catch (e) {
-        // ignore
+    
       }
     };
 
-    // open modal if query param is present
+   
     useEffect(() => {
       try {
         if (searchParams?.get("openChangePw") === "1") {
@@ -308,11 +304,11 @@ export default function AdminRecipesPage() {
           document.body.classList.add("rp-noscroll");
         }
       } catch (e) {
-        // ignore
+        
       }
     }, [searchParams]);
 
-    // ====== save new password======
+ 
     const savePassword = async () => {
         setPwErr("");
         setPwOk("");
@@ -339,11 +335,11 @@ export default function AdminRecipesPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-            // SHOW SUCCESS MODAL
+          
             setOpenChangePw(false);
             setOpenPwSuccess(true);
 
-            // auto-close after 5 seconds
+          
             successTimerRef.current = window.setTimeout(() => {
                 setOpenPwSuccess(false);
             }, 2000);
@@ -355,7 +351,7 @@ export default function AdminRecipesPage() {
         }
     };
 
-    // ====== edit recipe modal ======
+   
     const [openEditModal, setOpenEditModal] = useState(false);
     const [originalMeal, setOriginalMeal] = useState<Meal | null>(null);
     const [pristineOriginalMeal, setPristineOriginalMeal] = useState<Meal | null>(null);
@@ -370,7 +366,7 @@ export default function AdminRecipesPage() {
     const restoreSuccessTimerRef = useRef<number | null>(null);
 
     const openEditModal2 = (meal: Meal) => {
-        // Convert ingredients from MealDB format to array format
+       
         const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
         for (let i = 1; i <= 20; i++) {
             const ing = meal[`strIngredient${i}`];
@@ -392,7 +388,7 @@ export default function AdminRecipesPage() {
         };
         
         setOriginalMeal(meal);
-        // Only set pristineOriginalMeal on first open - preserves truly original data
+       
         if (!pristineOriginalMeal) {
             setPristineOriginalMeal(meal);
         }
@@ -422,7 +418,7 @@ export default function AdminRecipesPage() {
         
         setRestoreLoading(true);
         
-        // Convert ingredients back from PRISTINE ORIGINAL meal data
+     
         const ingredients: Array<{ name: string; measure: string; image?: string }> = [];
         for (let i = 1; i <= 20; i++) {
             const ing = pristineOriginalMeal[`strIngredient${i}`];
@@ -452,7 +448,7 @@ export default function AdminRecipesPage() {
         setRestoreSuccess(true);
         setRestoreLoading(false);
         
-        // Auto-close after 2 seconds
+       
         if (restoreSuccessTimerRef.current) {
             clearTimeout(restoreSuccessTimerRef.current);
         }
@@ -517,17 +513,17 @@ export default function AdminRecipesPage() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-            // Convert response data back to MealDB format
+        
             if (data && data.data) {
                 const savedRecipe = data.data;
                 
-                // Convert ingredients array back to individual strIngredient and strMeasure fields
+             
                 const convertedRecipe: any = {
                     ...savedRecipe,
                     strMealThumb: editFormData.strMealThumb,
                 };
                 
-                // Add strIngredient and strMeasure fields for MealDB compatibility
+              
                 if (Array.isArray(savedRecipe.ingredients)) {
                     console.log("Converting ingredients for storage, count:", savedRecipe.ingredients.length);
                     savedRecipe.ingredients.forEach((ing: any, idx: number) => {
@@ -537,22 +533,22 @@ export default function AdminRecipesPage() {
                     console.log("Converted recipe fields:", Object.keys(convertedRecipe).filter(k => k.startsWith('strIngredient') || k.startsWith('strMeasure')));
                 }
                 
-                // Update the recipe in the local state
+              
                 const updatedAll = all.map((m) =>
                     m.idMeal === convertedRecipe.idMeal ? convertedRecipe : m
                 );
                 setAll(updatedAll);
                 setFull(updatedAll);
                 
-                // Update editingMeal with saved data (but keep originalMeal unchanged for restore)
+             
                 setEditingMeal(convertedRecipe);
             }
 
-            // SHOW SUCCESS MODAL
+    
             setOpenEditModal(false);
             setEditSuccess(true);
 
-            // auto-close after 2 seconds
+         
             editSuccessTimerRef.current = window.setTimeout(() => {
                 setEditSuccess(false);
             }, 2000);
@@ -730,7 +726,7 @@ export default function AdminRecipesPage() {
                     )}
                 </section>
 
-                {/* ====== FILTER MODAL ====== */}
+                {/*FILTER MODAL */}
                 {isOpen && (
                     <div className="rp-modal is-open">
                         <div
@@ -742,7 +738,7 @@ export default function AdminRecipesPage() {
                         />
 
                         <div className="filter-card" role="dialog" aria-modal="true">
-                            {/* HEADER */}
+                         
                             <div className="filter-head">
                                 <h3>Filters</h3>
                             </div>
@@ -832,7 +828,7 @@ export default function AdminRecipesPage() {
                     </div>
                 )}
 
-                {/* ====== CHANGE PASSWORD MODAL ====== */}
+                {/*CHANGE PASSWORD MODAL*/}
                 {openChangePw && (
                     <div
                         className="rp-modal is-open rp-cpw"
@@ -919,7 +915,7 @@ export default function AdminRecipesPage() {
                     </div>
                 )}
 
-                {/* ====== EDIT RECIPE MODAL ====== */}
+                {/*EDIT RECIPE MODAL*/}
                 {openEditModal && editFormData && (
                     <div
                         className="rp-modal is-open rp-edit"
@@ -1109,7 +1105,7 @@ export default function AdminRecipesPage() {
 
             </main>
 
-            {/* ====== CSS ====== */}
+     
             <style jsx global>{`
         :root {
           --orange: #b45309;

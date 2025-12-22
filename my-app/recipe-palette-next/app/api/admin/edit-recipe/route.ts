@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       ingredients,
     } = body;
 
-    // Validate required fields
+  
     if (
       !idMeal ||
       !strMeal ||
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to Firestore under 'recipes' collection
+   
     const recipeRef = adminDb.collection("recipes").doc(String(idMeal));
 
     const recipeData = {

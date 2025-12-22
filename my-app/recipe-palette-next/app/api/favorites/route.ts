@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 
-// ===== CORS: React app origin =====
-// Allow React dev server running on port 3000 to call this API
+
 const corsHeaders = {
     "Access-Control-Allow-Origin": "http://localhost:3000",
     "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
@@ -24,7 +23,6 @@ export function OPTIONS() {
     return new NextResponse(null, withCors({ status: 204 }));
 }
 
-// ===== Auth helper =====
 async function getUid(req: NextRequest) {
     const authHeader = req.headers.get("authorization") || "";
     const token = authHeader.startsWith("Bearer ")
@@ -36,7 +34,7 @@ async function getUid(req: NextRequest) {
     try {
         const decoded = await adminAuth.verifyIdToken(token);
         console.log("Token verified for uid:", decoded.uid);
-        // include display name and picture when available so we can store them with favorites
+      
         return {
             uid: decoded.uid,
             email: decoded.email || null,
@@ -49,8 +47,8 @@ async function getUid(req: NextRequest) {
     }
 }
 
-// ===== Helper: build favorite doc =====
-function buildFavoriteDoc(meal: any, savedBy: any /* object with uid,name,email,photo or legacy string */) {
+
+function buildFavoriteDoc(meal: any, savedBy: any ) {
     const idMeal = meal.idMeal;
     const recipeName = meal.strMeal;
     const recipeImage = meal.strMealThumb;
@@ -85,7 +83,6 @@ function buildFavoriteDoc(meal: any, savedBy: any /* object with uid,name,email,
         instructions,
     };
 
-    // savedBy may be an object (preferred) or a legacy string (email/uid)
     if (savedBy && typeof savedBy === "object") {
         doc.savedBy = {
             uid: savedBy.uid || null,
@@ -106,7 +103,7 @@ function buildFavoriteDoc(meal: any, savedBy: any /* object with uid,name,email,
     return doc;
 }
 
-// ===== GET=====
+
 export async function GET(req: NextRequest) {
     try {
         const { uid } = await getUid(req);
@@ -129,7 +126,7 @@ export async function GET(req: NextRequest) {
                 ? data.instructions
                 : [];
 
-            // normalize savedBy fields for frontend convenience
+          
             const savedByObj = data.savedBy && typeof data.savedBy === "object" ? data.savedBy : null;
             const savedByName = savedByObj ? savedByObj.name || null : (typeof data.savedBy === "string" ? data.savedBy : null);
             const savedByPhoto = savedByObj ? savedByObj.photo || null : null;
@@ -162,7 +159,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// ===== POST=====
+
 export async function POST(req: NextRequest) {
     try {
         const { uid, email } = await getUid(req);
@@ -175,13 +172,13 @@ export async function POST(req: NextRequest) {
             );
         }
 
-            // include name/photo/email from token so favorites are tied to user's account details
+           
             const savedBy: { uid: string; name: string | null; email: string | null; photo?: string | null } = {
                 uid,
                 name: null,
                 email: email || null,
             };
-            // try to get name/photo from token as well
+     
             const tokenInfo = await adminAuth.getUser(uid).catch(() => null);
             if (tokenInfo) {
                 savedBy.name = tokenInfo.displayName || null;
@@ -210,7 +207,7 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// ===== DELETE=====
+
 export async function DELETE(req: NextRequest) {
     try {
         const { uid } = await getUid(req);

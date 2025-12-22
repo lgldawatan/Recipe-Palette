@@ -75,7 +75,7 @@ body.signin-view .rp-header {
   color: transparent;
 }
 
-/* Paragraph */
+
 .auth-copy {
   margin: 0 auto clamp(24px, 4vw, 40px);
   max-width: 720px;
@@ -84,7 +84,7 @@ body.signin-view .rp-header {
   font-size: 17px;
 }
 
-/* Google CTA*/
+
 .google-cta {
   --r: 9999px;
   position: relative;

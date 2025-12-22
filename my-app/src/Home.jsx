@@ -11,9 +11,7 @@ import Logo1 from "./Assets/logo.png";
 import { saveFavorite, removeFavorite } from "./favoritesApi";
 
 export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
-  /* ================================
-     UI STATE / NAV HELPERS
-     ================================ */
+ 
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLoginWarn, setShowLoginWarn] = useState(false);
@@ -21,9 +19,6 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
   const navigate = useNavigate();
   const scrollLockY = useRef(0);
 
-  /* ================================
-     MANAGED CONTENT STATE
-     ================================ */
   const [managedContent, setManagedContent] = useState({
     bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
     addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
@@ -31,7 +26,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
 
   const [aboutUsText, setAboutUsText] = useState("At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.");
 
-  // Fetch managed home content with real-time listener
+  
   useEffect(() => {
     const db = getFirestore();
     const docRef = doc(db, "config", "homeContent");
@@ -43,14 +38,14 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
 
     console.log("Setting up Firestore listener for home content...");
 
-    // Set up real-time listener
+   
     const unsubscribe = onSnapshot(
       docRef,
       (docSnap) => {
         if (docSnap.exists()) {
           const firestoreData = docSnap.data();
           console.log("Firestore data updated:", firestoreData);
-          // Merge Firestore data with defaults
+         
           const merged = {
             ...defaultContent,
             ...firestoreData,
@@ -63,19 +58,19 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
       },
       (error) => {
         console.error("Firestore listener error:", error);
-        // Fall back to defaults if Firestore is unavailable
+       
         setManagedContent(defaultContent);
       }
     );
 
-    // Cleanup listener on unmount
+   
     return () => {
       console.log("Cleaning up Firestore listener");
       unsubscribe();
     };
   }, []);
 
-  // Fetch about us text from aboutContent document
+  
   useEffect(() => {
     const db = getFirestore();
     const docRef = doc(db, "config", "aboutContent");
@@ -102,16 +97,10 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
     navigate("/signin", { replace: true });
   }
 
-  /* ================================
-     DATA CONFIG
-     ================================ */
   const API = "https://www.themealdb.com/api/json/v1/1";
   const CATEGORY = "Chicken";
   const LIMIT = 8;
 
-  /* ================================
-     DATA STATE
-     ================================ */
   const [meals, setMeals] = useState([]);
   const [status, setStatus] = useState("idle");
   const [detailMeal, setDetailMeal] = useState(null);
@@ -166,9 +155,6 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
       .filter(s => s && !/^(?:STEP\s*)?\d+$/i.test(s));
   }
 
-  /* ================================
-     BODY SCROLL-LOCK WHEN MODALS OPEN
-     ================================ */
   useEffect(() => {
     if (showLoginWarn || menuOpen) {
       scrollLockY.current = window.scrollY || 0;
@@ -185,9 +171,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
     };
   }, [showLoginWarn, menuOpen]);
 
-  /* ================================
-     INITIAL LOAD
-     ================================ */
+
   useEffect(() => {
     let cancelled = false;
 
@@ -223,9 +207,6 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
     return () => { cancelled = true; };
   }, []);
 
-  /* ================================
-     AUTH HELPERS
-     ================================ */
   const isAuthed = Boolean(user?.uid);
   const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
@@ -267,14 +248,10 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
     }
   };
 
-  /* ================================
-     RENDER
-     ================================ */
+
   return (
     <>
-      {/* ======================================================
-          HEADER 
-          ====================================================== */}
+   
       <header className="rp-header">
         <div className="rp-shell">
           {/* Brand / Logo */}
@@ -286,7 +263,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
             </span>
           </Link>
 
-          {/* Desktop / tablet right side */}
+     
           <div className="rp-right">
             <nav className="rp-nav" aria-label="Primary">
               <NavLink to="/" end className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>Home</NavLink>
@@ -295,7 +272,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
               <NavLink to="/favorites" onClick={handleFavoritesNav} className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>Favorites</NavLink>
             </nav>
 
-            {/* Profile button + dropdown (logout) */}
+         
             <div className="rp-profile-wrap">
               <button
                 type="button"
@@ -320,7 +297,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
             </div>
           </div>
 
-          {/* Mobile hamburger*/}
+  
           <button
             type="button"
             className="rp-menu-btn"
@@ -333,7 +310,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           </button>
         </div>
 
-        {/* Mobile slide-in panel */}
+    
         <div className={`mobile-panel ${menuOpen ? "is-open" : ""}`} id="mobileMenu" role="dialog" aria-modal="true">
           <div className="mobile-panel__head">
             <Link className="rp-brand" to="/" onClick={() => setMenuOpen(false)}>
@@ -364,11 +341,9 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
         />
       </header>
 
-      {/* ======================================================
-          MAIN CONTENT
-          ====================================================== */}
+      
       <main className="page">
-        {/* ---------- HERO ---------- */}
+    
         <section className="hero">
           <div className="hero__bg"></div>
           <div className="hero__content">
@@ -380,7 +355,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           </div>
         </section>
 
-        {/* ---------- ABOUT ---------- */}
+   
         <section className="about">
           <div className="about__bg"></div>
           <div className="about__card">
@@ -392,7 +367,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           </div>
         </section>
 
-        {/* ---------- FEATURED RECIPES ---------- */}
+       
         <section className="recipes">
           <div className="recipes__bar">
             <h2 className="recipes__title">SMART RECIPES. TASTIER MEALS.</h2>
@@ -443,7 +418,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
           </div>
         </section>
 
-        {/* ---------- CTA (Sign in to save) ---------- */}
+    
         <section className="cta-fav">
           <div className="cta-fav__bg"></div>
           <div className="cta-fav__card">
@@ -461,9 +436,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
         </section>
       </main>
 
-      {/* ======================================================
-          FOOTER
-          ====================================================== */}
+   
       <footer className="site-footer">
         <div className="footer-top">
           <p className="footer-tagline">
@@ -481,9 +454,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
         </div>
       </footer>
 
-      {/* ======================================================
-          LOGIN-REQUIRED MODAL
-          ====================================================== */}
+  
       {showLoginWarn && (
         <div
           className="rp-modal is-open login-modal"
@@ -513,7 +484,7 @@ export default function Home({ user, savedRecipes = [], setSavedRecipes }) {
         </div>
       )}
 
-      {/* ========= HOME: RECIPE DETAILS MODAL ========= */}
+   
       {detailMeal && (
         <div
           className="rp-modal is-open recipe-modal"

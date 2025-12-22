@@ -7,7 +7,6 @@ import { getFirestore, doc, onSnapshot } from "firebase/firestore";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import "./About.css";
-/* Assets */
 import Logo1 from "./Assets/logo.png";
 import Logo2 from "./Assets/api.png";
 import aboutBanner from "./Assets/about-banner1.png";
@@ -21,7 +20,7 @@ export default function About({ user }) {
   const [showLoginWarn, setShowLoginWarn] = useState(false);
   const scrollLockY = useRef(0);
 
-  // About content state
+  
   const [aboutContent, setAboutContent] = useState({
     aboutUsText: "At recipe palette., we believe cooking is more than just making meals. It's an art form. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
     ourStoryText: "Recipe Palette was born from the love of food and the belief that every kitchen can be a place of creativity. We wanted to create a space where flavors come together, cultures meet, and everyday meals are transformed into vibrant experiences. Whether you're a beginner in the kitchen or a seasoned cook, our platform is designed to inspire, guide, and celebrate your journey.",
@@ -40,7 +39,6 @@ export default function About({ user }) {
     navigate("/signin", { replace: true });
   }
 
-  /* Guard Favorites when logged out */
   const handleFavoritesNav = (e) => {
     if (!isAuthed) {
       e.preventDefault();
@@ -48,7 +46,7 @@ export default function About({ user }) {
     }
   };
 
-  // Set up Firestore listener for about content
+  
   useEffect(() => {
     try {
       const db = getFirestore();
@@ -87,7 +85,7 @@ export default function About({ user }) {
     }
   }, []);
 
-  /* === Body scroll lock while modal OR menu is open === */
+ 
   useEffect(() => {
     if (showLoginWarn || menuOpen) {
       scrollLockY.current = window.scrollY || 0;
@@ -106,7 +104,7 @@ export default function About({ user }) {
 
   return (
     <>
-      {/* ================= HEADER================= */}
+   
       <header className="rp-header">
         <div className="rp-shell">
           {/* Brand */}
@@ -134,7 +132,7 @@ export default function About({ user }) {
               <NavLink to="/favorites" onClick={handleFavoritesNav} className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>Favorites</NavLink>
             </nav>
 
-            {/* Profile button + dropdown */}
+            
             <div className="rp-profile-wrap">
               <button
                 type="button"
@@ -163,7 +161,7 @@ export default function About({ user }) {
             </div>
           </div>
 
-          {/* Mobile hamburger (visible ≤900px via CSS) */}
+        
           <button
             type="button"
             className="rp-menu-btn"
@@ -176,7 +174,7 @@ export default function About({ user }) {
           </button>
         </div>
 
-        {/* Mobile slide-down white panel*/}
+      
         <div
           className={`mobile-panel ${menuOpen ? "is-open" : ""}`}
           id="mobileMenu"
@@ -217,7 +215,7 @@ export default function About({ user }) {
           </nav>
         </div>
 
-        {/*Scrim is disabled by CSS*/}
+      
         <button
           className={`nav-overlay ${menuOpen ? "is-open" : ""}`}
           aria-hidden={!menuOpen}
@@ -225,7 +223,7 @@ export default function About({ user }) {
         />
       </header>
 
-      {/* ================= MAIN CONTENT (About page) ================= */}
+    
       <div className="about-wrap">
         <main className="page about-main">
           <section className="about-page">
@@ -251,7 +249,7 @@ export default function About({ user }) {
             </div>
           </section>
 
-          {/* Info blocks */}
+      
           <section className="about-blocks">
             <div className="info-grid">
               <article className="info-card info--navy">
@@ -310,7 +308,7 @@ export default function About({ user }) {
         </footer>
       </div>
 
-      {/* ============== Login required modal============== */}
+   
       {showLoginWarn && (
         <div
           className="rp-modal is-open login-modal"

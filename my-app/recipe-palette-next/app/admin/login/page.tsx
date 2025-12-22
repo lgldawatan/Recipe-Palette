@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  if (isLoading) return; // PREVENT DOUBLE SUBMIT
+  if (isLoading) return; 
 
   setErrorMsg("");
   setIsLoading(true);
@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    // SUCCESS — redirect ONCE
+    
     router.push("/admin/recipes");
 
   } catch {
@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
                                 />
                             </button>
                         </div>
-                        {/* ERROR MESSAGE BELOW INPUTS */}
+                
                         {errorMsg && (
                             <div className="form-error">
                                 {errorMsg}
@@ -145,7 +145,7 @@ export default function AdminLoginPage() {
                 </section>
             </main>
 
-            {/* STYLES */}
+         
             <style jsx>{`
 
             html, body {

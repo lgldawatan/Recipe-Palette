@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       );
     }
 
-    //admin collection
+  
     const adminRef = adminDb.collection("admin").doc(username);
     const adminSnap = await adminRef.get();
 
@@ -43,12 +43,12 @@ export async function POST(req: Request) {
       { status: 200 }
     );
     
-    // Set authentication cookie
+    
     response.cookies.set("adminAuth", username, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;

@@ -10,29 +10,15 @@ import Logo2 from "./Assets/api.png";
 import { saveFavorite, removeFavorite } from "./favoritesApi";
 
 export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
-  // ==============================
-  // Constants / Config
-  // ==============================
+
   const API = "https://www.themealdb.com/api/json/v1/1";
   const LABEL_ALL = "All Recipes";
   const PER_PAGE = 16;
-
-  // ==============================
-  // UI state
-  // ==============================
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const scrollLockY = useRef(0);
-
-  // ==============================
-  // Refs for measuring UI
-  // ==============================
   const barRef = useRef(null);
   const crumbsRef = useRef(null);
-
-  // ==============================
-  // Data / Control state
-  // ==============================
   const [crumbs, setCrumbs] = useState(LABEL_ALL);
   const [full, setFull] = useState([]);
   const [all, setAll] = useState([]);
@@ -43,14 +29,14 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [customRecipes, setCustomRecipes] = useState({});
 
-  // Filter modal controls and options
+
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [areas, setAreas] = useState([]);
   const [selCats, setSelCats] = useState(new Set());
   const [selAreas, setSelAreas] = useState(new Set());
 
-  // details modal
+
   const [detailMeal, setDetailMeal] = useState(null);
   const openMeal = (m) => { setDetailMeal(m); document.body.classList.add("rp-noscroll"); };
   const closeMeal = () => { setDetailMeal(null); document.body.classList.remove("rp-noscroll"); };
@@ -87,9 +73,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
   const [showLoginWarn, setShowLoginWarn] = useState(false);
 
-  // ==============================
-  // Auth-derived helpers
-  // ==============================
   const isAuthed = Boolean(user && user.uid);
   const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
@@ -119,12 +102,12 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
 
   useEffect(() => {
     if (showLoginWarn) {
-      // lock scroll
+     
       scrollLockY.current = window.scrollY || 0;
       document.body.style.top = `-${scrollLockY.current}px`;
       document.body.classList.add("rp-noscroll");
     } else {
-      // unlock scroll
+     
       document.body.classList.remove("rp-noscroll");
       document.body.style.top = "";
       window.scrollTo(0, scrollLockY.current);
@@ -136,9 +119,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     };
   }, [showLoginWarn]);
 
-  // ==============================
-  // Data loading
-  // ==============================
   const loadAll = useCallback(async () => {
     setStatus("loading");
     setErrMsg("");
@@ -197,10 +177,10 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   }, [API, j, LABEL_ALL]);
 
-  // Fetch custom recipes from Firestore
+ 
   const loadCustomRecipes = useCallback(async () => {
     try {
-      // Use the Next.js API base URL from env
+     
       const apiBase = process.env.REACT_APP_API_BASE || "http://localhost:3001";
       const apiUrl = apiBase + "/api/recipes/custom?t=" + Date.now();
       console.log("Fetching from:", apiUrl);
@@ -218,11 +198,10 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   }, []);
 
-  // Convert custom recipe ingredients to MealDB format
   const convertCustomRecipeFormat = useCallback((recipe) => {
     if (!recipe) return recipe;
     
-    // If ingredients are in array format, convert to MealDB format
+
     if (Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0) {
       const converted = { ...recipe };
       recipe.ingredients.forEach((ing, i) => {
@@ -230,7 +209,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         converted[`strIngredient${index}`] = ing.name || "";
         converted[`strMeasure${index}`] = ing.measure || "";
       });
-      // Clear remaining ingredient slots
+     
       for (let i = recipe.ingredients.length + 1; i <= 20; i++) {
         converted[`strIngredient${i}`] = "";
         converted[`strMeasure${i}`] = "";
@@ -240,7 +219,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     return recipe;
   }, []);
 
-  // Merge custom recipes with MealDB recipes
+  
   const mergeRecipesWithCustom = useCallback((meals) => {
     return meals.map((meal) => {
       const custom = customRecipes[meal.idMeal];
@@ -255,7 +234,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     });
   }, [customRecipes, convertCustomRecipeFormat]);
 
-  // Refresh custom recipes (useful after editing)
   const refreshCustomRecipes = useCallback(async () => {
     await loadCustomRecipes();
   }, [loadCustomRecipes]);
@@ -277,7 +255,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     })();
   }, [loadAll, loadCustomRecipes, j]);
 
-  // Refresh custom recipes every 3 seconds to catch admin edits
+  
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("Polling for custom recipe updates...");
@@ -286,9 +264,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     return () => clearInterval(interval);
   }, [loadCustomRecipes]);
 
-  // ==============================
-  // Searching helpers
-  // ==============================
   const mergeMeals = (...lists) => {
     const map = new Map();
     lists.flat().forEach((m) => { if (m?.idMeal) map.set(m.idMeal, m); });
@@ -322,9 +297,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   };
 
-  // ==============================
-  // Filtering helpers
-  // ==============================
   const idsFromMeals = (meals) => (meals || []).map((m) => m.idMeal);
   const idsByCategories = async (set) => {
     if (!set.size) return null;
@@ -351,7 +323,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     return out;
   };
 
-  // Apply selected filters
+ 
   async function applyFilters(selCats, selAreas) {
     if (selCats.size === 0 && selAreas.size === 0) {
 
@@ -395,9 +367,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   }
 
-  // ==============================
-  // Pagination slice
-  // ==============================
+
   const pages = Math.ceil(all.length / PER_PAGE) || 0;
   const start = (page - 1) * PER_PAGE;
   const slice = all.slice(start, start + PER_PAGE);
@@ -439,12 +409,9 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
     }
   };
 
-  // ==============================
-  // Render
-  // ==============================
   return (
     <>
-      {/* ================= Header================= */}
+     
       <header className="rp-header">
         <div className="rp-shell">
           {/* Brand / Logo */}
@@ -460,7 +427,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
           </Link>
 
           <div className="rp-right">
-            {/* Primary nav */}
+        
             <nav className="rp-nav">
               <NavLink to="/" end className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>Home</NavLink>
               <NavLink to="/about" className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>About</NavLink>
@@ -468,7 +435,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
               <NavLink to="/favorites" onClick={handleFavoritesNav} className={({ isActive }) => `rp-link ${isActive ? "rp-link--active" : ""}`}>Favorites</NavLink>
             </nav>
 
-            {/* Profile dropdown */}
+          
             <div className="rp-profile-wrap">
               <button
                 type="button"
@@ -502,7 +469,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             </div>
           </div>
 
-          {/* Burger button (shown ≤900px via CSS) */}
+       
           <button
             type="button"
             className="rp-menu-btn"
@@ -515,7 +482,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
           </button>
         </div>
 
-        {/* Mobile panel (same as Home) */}
+     
         <div className={`mobile-panel ${menuOpen ? "is-open" : ""}`} id="mobileMenu" role="dialog" aria-modal="true">
           <div className="mobile-panel__head">
             <Link className="rp-brand" to="/" onClick={() => setMenuOpen(false)}>
@@ -539,7 +506,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
           </nav>
         </div>
 
-        {/* Scrim */}
+       
         <button
           className={`nav-overlay ${menuOpen ? "is-open" : ""}`}
           aria-hidden={!menuOpen}
@@ -548,7 +515,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
       </header>
 
 
-      {/* ================= Main content ================= */}
+     
       <main className="page recipes-page">
         <section className="hero-recipes">
           <div className="hero-wrap">
@@ -618,7 +585,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
               </div>
             )}
 
-            {/* Empty state when no matches */}
+     
             {status === "success" && slice.length === 0 && (
               <div className="r-empty">
                 <i className="bi bi-emoji-frown r-empty__icon" aria-hidden="true"></i>
@@ -664,7 +631,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
             ))}
           </div>
 
-          {/* Pagination controls */}
+      
           {status === "success" && slice.length > 0 && pages > 1 && (
             <nav className="r-pager" aria-label="Recipe pagination">
               <button className="r-page icon" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>{"<"}</button>
@@ -720,7 +687,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
                   </div>
                 </div>
 
-                {/* Cuisine/Area chips */}
+                {/* Cuisine/Area*/}
                 <div className="rp-field">
                   <label className="rp-field__label">Cuisine</label>
                   <div className="chip-list" aria-label="Cuisines">
@@ -782,7 +749,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         )}
       </main>
 
-      {/* ================= Footer ================= */}
+
       <footer className="site-footer">
         <div className="footer-top">
           <p className="footer-tagline">
@@ -799,7 +766,6 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         </div>
       </footer>
 
-      {/* ================= Login required modal================= */}
       {showLoginWarn && (
         <div
           className="rp-modal is-open login-modal"
@@ -810,7 +776,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         >
           <div className="rp-modal__scrim" />
           <div className="rp-modal__panel" role="dialog" aria-modal="true" aria-labelledby="needLogin">
-            {/* Warning icon */}
+          
             <div className="login-modal__icon" aria-hidden="true">
               <i className="bi bi-exclamation-circle" />
             </div>
@@ -851,23 +817,23 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
         >
           <div className="rp-modal__scrim" />
           <div className="rp-modal__panel rp-modal--recipe recipe-modal--simple" role="dialog" aria-modal="true" aria-labelledby="rmTitle">
-            {/* close button */}
+           
             <button className="rp-modal__close" aria-label="Close" onClick={closeMeal}>×</button>
 
-            {/* orange banner */}
+          
             <div className="rmodal__banner">
               <span>Learn About The Recipe</span>
             </div>
 
             <div className="rp-modal__body rmodal">
-              {/* dish name */}
+           
               <h3 id="rmTitle" className="rmodal__name">{mergedMeal.strMeal}</h3>
 
               {/* INGREDIENTS */}
               <div className="rmodal__section">
                 <h4 className="rmodal__label">Ingredients</h4>
 
-                {/* simple cards (no image) */}
+               
                 <div className="rmodal__chips rmodal__chips--grid">
                   {ingredientItems(mergedMeal).map((it, i) => (
                     <figure key={i} className="ing ing--card">
@@ -877,7 +843,7 @@ export default function Recipes({ user, savedRecipes, setSavedRecipes }) {
                         alt={it.name}
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.style.display = "none"; // hide if missing
+                          e.currentTarget.style.display = "none"; 
                         }}
                       />
                       <figcaption>

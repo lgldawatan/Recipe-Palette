@@ -39,7 +39,7 @@ export default function AdminHomePage() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error">("success");
 
-  // Fetch home content
+ 
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -63,7 +63,7 @@ export default function AdminHomePage() {
     fetchContent();
   }, [router]);
 
-  // Close dropdowns on escape
+
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -75,7 +75,7 @@ export default function AdminHomePage() {
     return () => document.removeEventListener("keydown", onEsc);
   }, []);
 
-  // Close profile on outside click
+  
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!profileWrapRef.current) return;
@@ -177,9 +177,9 @@ export default function AdminHomePage() {
         </div>
       </nav>
 
-      {/* Main Container */}
+   
       <div style={layoutStyles.mainContainer}>
-        {/* Sidebar */}
+      
         <aside style={{ ...sidebarStyles.sidebar, display: openMobileNav ? "block" : "none" }}>
           <nav style={sidebarStyles.nav}>
             <a
@@ -202,7 +202,7 @@ export default function AdminHomePage() {
             </a>
           </nav>
 
-          {/* Profile Section */}
+        
           <div ref={profileWrapRef} style={sidebarStyles.profileWrap}>
             <button
               style={sidebarStyles.profileBtn}
@@ -234,9 +234,8 @@ export default function AdminHomePage() {
           </div>
         </aside>
 
-        {/* Content Area */}
         <main style={layoutStyles.content}>
-          {/* Header */}
+    
           <div style={headerStyles.header}>
             <h2 style={headerStyles.title}>Manage Home Page Content</h2>
             <button
@@ -248,7 +247,7 @@ export default function AdminHomePage() {
             </button>
           </div>
 
-          {/* Message */}
+       
           {message && (
             <div
               style={{
@@ -271,9 +270,9 @@ export default function AdminHomePage() {
             </div>
           )}
 
-          {/* Content Editor Sections */}
+      
           <div style={editorStyles.container}>
-            {/* Banner Text Section */}
+       
             <EditSection
               title="Banner Text"
               text={content.bannerText}
@@ -320,7 +319,7 @@ export default function AdminHomePage() {
   );
 }
 
-// Edit Section Component
+
 interface EditSectionProps {
   title: string;
   text: string;
@@ -382,7 +381,7 @@ function EditSection({
   );
 }
 
-// Styles
+
 const navStyles = {
   bar: {
     backgroundColor: "#D97706",

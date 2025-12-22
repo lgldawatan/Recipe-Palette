@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     if (docSnap.exists) {
       const data = docSnap.data();
-      // Merge with defaults to ensure all fields exist
+   
       return NextResponse.json({ ...DEFAULT_CONTENT, ...data });
     } else {
       return NextResponse.json(DEFAULT_CONTENT);

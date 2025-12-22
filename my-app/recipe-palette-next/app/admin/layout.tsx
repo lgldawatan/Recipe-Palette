@@ -60,10 +60,10 @@ export default function AdminLayout({
         rel="stylesheet"
       />
 
-      {/* Header */}
+
       {pathname !== "/admin/login" && <header className="rp-header">
         <div className="rp-shell">
-          {/* LEFT: logo + wordmark */}
+      
           <button
             className="rp-brand"
             onClick={() => router.push("/admin/recipes")}
@@ -76,7 +76,7 @@ export default function AdminLayout({
             </span>
           </button>
 
-          {/* CENTER: links */}
+      
           <nav className="rp-nav" aria-label="Admin Navigation">
             <button className={`rp-link ${isActive("/admin/home") ? "rp-link--active" : ""}`} onClick={() => router.push("/admin/home")} type="button">
               Home
@@ -89,7 +89,7 @@ export default function AdminLayout({
             </button>
           </nav>
 
-          {/* RIGHT: profile + dropdown */}
+        
           <div className="rp-profileWrap" ref={profileWrapRef}>
             <button
               className="rp-profile"
@@ -131,7 +131,6 @@ export default function AdminLayout({
             )}
           </div>
 
-          {/* MOBILE MENU BUTTON */}
           <button
             className="rp-menu-btn"
             aria-label="Open menu"
@@ -146,7 +145,7 @@ export default function AdminLayout({
       </header>
       }
 
-      {/* Mobile Nav Overlay */}
+   
       {openMobileNav && (
         <div className="rp-mobile">
           <div className="rp-mobile-head">
@@ -226,7 +225,7 @@ export default function AdminLayout({
         </div>
       )}
 
-      {/* Content */}
+    
       <main className="rp-admin-main">
         {children}
       </main>

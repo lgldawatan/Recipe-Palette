@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminDb } from "@/lib/firebaseAdmin";
 
-// Check if user is authenticated
+
 async function isAuthenticated() {
   const cookieStore = await cookies();
   const adminAuth = cookieStore.get("adminAuth");
   return !!adminAuth?.value;
 }
 
-// Default home content
+
 const DEFAULT_CONTENT = {
   bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
   aboutUsText: "At recipe palette. we believe cooking is more than just making meals—it's an art. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     if (docSnap.exists) {
       return NextResponse.json(docSnap.data());
     } else {
-      // Initialize with default content if doesn't exist
+     
       await docRef.set(DEFAULT_CONTENT);
       return NextResponse.json(DEFAULT_CONTENT);
     }

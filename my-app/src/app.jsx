@@ -28,7 +28,7 @@ export default function App() {
           element={user ? <Home /> : <Navigate to="/login" replace />}
         />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-        {/*catch-all */}
+      
         <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
       </Routes>
     </Router>

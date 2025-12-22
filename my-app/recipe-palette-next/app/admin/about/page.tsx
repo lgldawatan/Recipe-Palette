@@ -40,7 +40,6 @@ export default function AdminAboutPage() {
     joinUsText: "At Recipe Palette, we celebrate the joy of food and the art of flavor. Explore new dishes, create your own, and share the stories behind every meal. Because every recipe adds color to your journey — and together, they create a palette worth savoring.",
   };
 
-  // Fetch about content
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -114,7 +113,7 @@ export default function AdminAboutPage() {
       setMessageType("success");
       setMessage(`${field} restored to defaults`);
       
-      // Auto-close after 2 seconds
+     
       if (messageTimerRef.current) {
         clearTimeout(messageTimerRef.current);
       }

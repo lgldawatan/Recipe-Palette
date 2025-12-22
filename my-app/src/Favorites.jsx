@@ -21,7 +21,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
   const avatar = user?.photoURL || null;
   const displayName = user?.displayName || "Profile";
 
-  // Logout 
+ 
   async function handleLogout() {
     await signOut(auth);
     navigate("/signin", { replace: true });
@@ -38,7 +38,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
     const exists = isFav(meal.idMeal);
     const prev = savedRecipes || [];
 
-    // optimistic update
+   
     setSavedRecipes((pv) =>
       exists ? pv.filter((x) => x.idMeal !== meal.idMeal) : [...pv, meal]
     );
@@ -51,7 +51,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
       }
     } catch (err) {
       console.error("Failed to update favorite:", err);
-      // revert optimistic update
+     
       setSavedRecipes(prev);
       alert("Failed to update favorites. Please try again.");
     }
@@ -185,7 +185,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
           </Link>
 
           <div className="rp-right">
-            {/* Primary nav (desktop) */}
+          
             <nav className="rp-nav">
               <NavLink
                 to="/"
@@ -222,7 +222,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
               </NavLink>
             </nav>
 
-            {/* Profile + dropdown */}
+        
             <div className="rp-profile-wrap">
               <button
                 type="button"
@@ -261,7 +261,6 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
             </div>
           </div>
 
-          {/* Burger button (mobile) */}
           <button
             type="button"
             className="rp-menu-btn"
@@ -274,7 +273,6 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
           </button>
         </div>
 
-        {/* Mobile panel */}
         <div
           className={`mobile-panel ${menuOpen ? "is-open" : ""}`}
           id="mobileMenu"
@@ -353,7 +351,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
           </nav>
         </div>
 
-        {/* Scrim behind the mobile panel */}
+      
         <button
           className={`nav-overlay ${menuOpen ? "is-open" : ""}`}
           aria-hidden={!menuOpen}
@@ -475,7 +473,7 @@ export default function Favorites({ user, savedRecipes = [], setSavedRecipes }) 
                         {ingSummary && (
                           <p className="recipe-card__desc">{ingSummary}</p>
                         )}
-                        {/* saved-by info removed per UX: do not display name/photo on Favorites cards */}
+                       
                       </div>
                     </article>
                   );

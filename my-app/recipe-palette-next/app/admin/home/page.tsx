@@ -31,7 +31,6 @@ export default function AdminHomePage() {
     addToFavoritesText: "Whether you're trying something new or perfecting a family classic, recipe palette. is your space to learn, create, and celebrate the joy of food. Sign up to save your favorite recipes and build your personal flavor palette.",
   };
 
-  // Fetch home content
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -105,7 +104,7 @@ export default function AdminHomePage() {
       setMessageType("success");
       setMessage(`${field} restored to defaults`);
       
-      // Auto-close after 2 seconds
+    
       if (messageTimerRef.current) {
         clearTimeout(messageTimerRef.current);
       }
@@ -356,7 +355,7 @@ export default function AdminHomePage() {
   );
 }
 
-// Edit Section Component
+
 interface EditSectionProps {
   title: string;
   fieldName?: string;

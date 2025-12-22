@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebaseAdmin";
 
-// Default home content
+
 const DEFAULT_CONTENT = {
   bannerText: "DISCOVER TASTE INSPIRATION\n\nExplore a palette of recipes, discover vibrant flavors, and let your kitchen become the canvas for your culinary art. Turn everyday cooking into moments of creativity and delight.",
   bannerImage: "/banner1.png",
@@ -19,13 +19,13 @@ export async function GET(req: NextRequest) {
     if (docSnap.exists) {
       return NextResponse.json(docSnap.data());
     } else {
-      // Initialize with default content if doesn't exist
+    
       await docRef.set(DEFAULT_CONTENT);
       return NextResponse.json(DEFAULT_CONTENT);
     }
   } catch (error) {
     console.error("GET error:", error);
-    // Return default content on error
+    
     return NextResponse.json(DEFAULT_CONTENT);
   }
 }

@@ -65,7 +65,7 @@ body.rp-noscroll {
   color: #0f2a3f;
 }
 
-/* Right side (nav + profile) */
+
 .rp-right {
   display: flex;
   align-items: center;
@@ -283,7 +283,7 @@ body.rp-noscroll {
   display: block;
 }
 
-/* Dropdown: centered below the profile*/
+
 .rp-dropdown {
   position: absolute;
   top: calc(100% + 5px);
@@ -337,14 +337,14 @@ body.rp-noscroll {
 }
 
 
-/* ===== Footer===== */
+
 .site-footer {
   margin-top: 60px;
   font-family: Poppins, sans-serif;
   text-align: center;
 }
 
-/* Orange band */
+
 .footer-top {
   background: white;
   color: #1f1f1f;
@@ -357,7 +357,7 @@ body.rp-noscroll {
   line-height: 1.6;
 }
 
-/* Two logos centered */
+
 .footer-logos {
   display: flex;
   justify-content: center;
@@ -372,7 +372,7 @@ body.rp-noscroll {
   object-fit: contain;
   filter: none;
 }
-/* Bottom grey strip */
+
 .footer-bottom {
   background: #f7f3ef;
   padding: 1px 20px !important;
@@ -401,11 +401,11 @@ body.rp-noscroll {
 }
 
 .rp-shell {
-  width: 93% !important;     /* same indent as page */
+  width: 93% !important;    
   max-width: 100% !important;
   margin-left: auto;
   margin-right: auto;
-  padding-inline: 50px !important; /* balanced inner spacing */
+  padding-inline: 50px !important;
   overflow: visible !important;
 }
 
@@ -444,7 +444,7 @@ body.rp-noscroll {
   z-index: 1000;
 }
 
-/* White pill */
+
 .rp-shell {
   width: 100%;
   max-width: calc(var(--container) + 16rem);
@@ -457,7 +457,7 @@ body.rp-noscroll {
   justify-content: space-between;
 }
 
-/* Left brand */
+
 .rp-brand {
   display: flex;
   align-items: center;
@@ -476,14 +476,14 @@ body.rp-noscroll {
   color: #0f2a3f;
 }
 
-/* Right side (nav + profile) */
+
 .rp-right {
   display: flex;
   align-items: center;
   gap: 70px;
 }
 
-/* Nav links */
+
 .rp-nav {
   display: flex;
   gap: 70px;
@@ -501,7 +501,7 @@ body.rp-noscroll {
   font-weight: 700;
 }
 
-/* Profile icon */
+
 .rp-profile {
   width: 45px !important;
   height: 45px !important;
@@ -664,7 +664,6 @@ body.rp-noscroll {
   }
 }
 
-/* Profile avatar*/
 .rp-profile-wrap {
   position: relative;
   display: inline-grid;
@@ -694,7 +693,7 @@ body.rp-noscroll {
   display: block;
 }
 
-/* Dropdown: centered below the profile*/
+
 .rp-dropdown {
   position: absolute;
   top: calc(100% + 5px);
@@ -748,14 +747,13 @@ body.rp-noscroll {
 }
 
 
-/* ===== Footer===== */
+
 .site-footer {
   margin-top: 60px;
   font-family: Poppins, sans-serif;
   text-align: center;
 }
 
-/* Orange band */
 .footer-top {
   background: white;
   color: #1f1f1f;
@@ -768,7 +766,7 @@ body.rp-noscroll {
   line-height: 1.6;
 }
 
-/* Two logos centered */
+
 .footer-logos {
   display: flex;
   justify-content: center;
@@ -783,7 +781,7 @@ body.rp-noscroll {
   object-fit: contain;
   filter: none;
 }
-/* Bottom grey strip */
+
 .footer-bottom {
   background: #f7f3ef;
   padding: 1px 20px !important;
@@ -812,17 +810,17 @@ body.rp-noscroll {
 }
 
 .rp-shell {
-  width: 93% !important;     /* same indent as page */
+  width: 93% !important;     
   max-width: 100% !important;
   margin-left: auto;
   margin-right: auto;
-  padding-inline: 50px !important; /* balanced inner spacing */
+  padding-inline: 50px !important; 
 }
 
 
 
 
-/* Burger button (inside pill, rightmost) */
+
 .rp-menu-btn{
   display:none;
   background:transparent; border:0;
@@ -831,28 +829,27 @@ body.rp-noscroll {
   margin-left:auto;
 }
 
-/* ⚠️ Important: the mobile panel is FIXED at top
-   so it *overlays* the orange bar completely. */
+
 .mobile-panel{
   position: fixed;
   top: 0; left: 0; right: 0;
   background:#fff;
   border-bottom:1px solid #e9e9e9;
   box-shadow: 0 10px 30px rgba(0,0,0,.08);
-  transform: translateY(-100%);        /* hidden above the viewport */
+  transform: translateY(-100%);        
   transition: transform .25s ease;
-  z-index: 2000;                        /* above the orange header */
+  z-index: 2000;                       
 }
 .mobile-panel.is-open{ transform: translateY(0); }
 
-/* Panel head: logo + close */
+
 .mobile-panel__head{
   display:flex; align-items:center; justify-content:space-between;
   padding:12px 20px; border-bottom:1px solid #e9e9e9;
 }
 .mobile-panel__close{ font-size:28px; line-height:1; background:none; border:0; color:#0f2a3f; cursor:pointer; }
 
-/* Mobile nav list = flat rows w/ separators */
+
 .mobile-nav{ display:block; padding:0; margin:0; }
 .mobile-nav :where(a,button){
   display:flex; align-items:center; justify-content:center;
@@ -864,29 +861,29 @@ body.rp-noscroll {
 .mobile-nav :where(a,button):hover{ background:#DF861E; color:#fff; }
 .mobile-nav__cta{ background:#fff !important; color:#0f2a3f !important; }
 
-/* No dark scrim; keep page visible */
+
 .nav-overlay{ display:none !important; }
 
-/* Avoid any right-edge seam when menu opens */
+
 html, body { overflow-x: hidden; background:#fff; }
 :root{ --sbw: calc(100vw - 100%); }
 body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var(--sbw); }
 
 .mobile-nav :where(a,button){
-  height: 48px;                /* was 56px */
-  padding: 0 12px;             /* smaller side padding */
+  height: 48px;               
+  padding: 0 12px;            
   transition: background .18s ease, color .18s ease;
 }
 
-/* Hover / focus = orange */
+
 .mobile-nav :where(a,button):hover,
 .mobile-nav :where(a,button):focus-visible{
   background:#DF861E;
   color:#fff;
-  outline: none;               /* keep it clean */
+  outline: none;            
 }
 
-/* Selected/active page (cover common cases: NavLink, aria-current, manual class) */
+
 .mobile-nav a.active,
 .mobile-nav a[aria-current="page"],
 .mobile-nav .is-active{
@@ -895,19 +892,19 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   font-weight:600;
 }
 
-/* DESKTOP: hover + active color */
+
 .rp-nav .rp-link{
   transition: color .18s ease;
-  padding-inline: 6px;         /* optional: a touch tighter */
+  padding-inline: 6px;         
 }
 .rp-nav .rp-link:hover,
 .rp-nav .rp-link:focus-visible{ color:#DF861E; }
 .rp-link--active{ color:#DF861E; font-weight:700; }
 
-/* Breakpoints */
+
 @media (max-width:1024px){ .rp-nav{ gap:20px; } }
 @media (max-width:900px){
-  .rp-nav, .rp-profile-wrap{ display:none; }  /* hide desktop nav/profile */
+  .rp-nav, .rp-profile-wrap{ display:none; }  
   .rp-right{ display:flex; align-items:center; gap:0; width:100%; }
   .rp-menu-btn{ display:block; }
   .rp-shell{ height:56px; padding-inline:16px; }
@@ -926,7 +923,6 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 }
 
 
-/* Breakpoint */
 @media (max-width: 900px) {
   .rp-nav,
   .rp-profile-wrap {
@@ -952,24 +948,23 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
     font-size: 17px;
   }
 }
-/* Tiny phones: tighten spacing a bit more */
+
 @media (max-width: 420px) {
   .mobile-nav a, .mobile-nav button { font-size: 14px; padding: 11px 12px; }
 }
-/* Keep contents clipped to the white pill */
+
 .rp-shell { overflow: hidden; }
 
-/* Mobile layout: hide links/profile but KEEP rp-right (for the burger) */
 @media (max-width: 900px){
   .rp-nav, .rp-profile-wrap { display:none; }
   .rp-right { display:flex; align-items:center; gap:0; }
-  .rp-menu-btn { display:block; margin-left:auto; }  /* push burger to far-right */
+  .rp-menu-btn { display:block; margin-left:auto; }  
   .rp-shell { height:56px; padding-inline:30px !important; }
   .rp-logo-stack { height:24px; }
   .rp-wordmark { font-size:17px; }
 }
 
-/* Extra-tight phones (≤360px) — shrink brand & padding a bit more */
+
 @media (max-width: 360px){
   .rp-shell      { padding-inline:12px; }
   .rp-brand      { gap:6px; min-width:0; }
@@ -978,7 +973,7 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   .rp-menu-btn   { font-size:28px; }
 }
 
-/* Micro (≤320px) — final squeeze to keep burger inside the pill */
+
 @media (max-width: 320px){
   .rp-shell      { padding-inline:27px !important; }
   .rp-wordmark   { font-size:14px; }
@@ -986,9 +981,6 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 }
 
 
-/* ===== Footer Responsive Tweaks ===== */
-
-/* Tablets (≤900px) */
 @media (max-width: 900px) {
   .footer-tagline {
     font-size: 14px !important;
@@ -1009,7 +1001,7 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   }
 }
 
-/* Phones (≤600px) */
+
 @media (max-width: 600px) {
   .footer-top {
     padding: 20px 12px 22px;
@@ -1037,7 +1029,7 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   }
 }
 
-/* Extra small phones (≤360px) */
+
 @media (max-width: 360px) {
   .footer-tagline {
     font-size: 14px !important;
@@ -1057,9 +1049,7 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
     padding: 6px 10px;
   }
 }
-/* =========================
-   Login modal – compact & equal buttons
-   ========================= */
+
    @media (max-width: 600px) {
     .login-modal .rp-modal__panel {
       width: min(300px, 90vw);
@@ -1081,11 +1071,11 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
       line-height: 1.45;
     }
   
-    /* Buttons row */
+
     .login-modal .rp-modal__foot {
       padding: 10px 12px 14px;
     }
-/* === Login modal: make Cancel & Sign in EXACTLY the same size === */
+
 .login-modal .rp-modal__actions {
   display: flex;
   gap: 10px;
@@ -1094,27 +1084,26 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 
 .login-modal .rp-modal__actions > .btn-plain,
 .login-modal .rp-modal__actions > .btn-accent {
-  /* same box for both (button and link) */
+ 
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
 
-  flex: 1 1 0 !important;   /* equal width */
+  flex: 1 1 0 !important;  
   min-width: 0 !important;
 
-  height: 46px !important;  /* exact same height */
-  padding: 0 14px !important;  /* only horizontal padding */
+  height: 46px !important; 
+  padding: 0 14px !important;  
   line-height: 1 !important;
   box-sizing: border-box !important;
   border-radius: 14px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
 
-  /* ensure both have a border so outline vs filled don't change height */
   border: 1.5px solid transparent !important;
 }
 
-/* keep visual styles */
+
 .login-modal .rp-modal__actions > .btn-plain {
   background: #fff !important;
   color: #222 !important;
@@ -1122,12 +1111,12 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 }
 
 .login-modal .rp-modal__actions > .btn-accent {
-  background: #DF861E !important; /* your orange */
+  background: #DF861E !important; 
   color: #fff !important;
-  /* still has the same 1.5px transparent border from the rule above */
+  
 }
 
-/* tiniest phones */
+
 @media (max-width: 360px){
   .login-modal .rp-modal__actions > .btn-plain,
   .login-modal .rp-modal__actions > .btn-accent {
@@ -1139,13 +1128,10 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 
    }
 
-   /* =========================================================
-   📱 Recipe Details Modal — responsive (Home / Recipes / Favorites)
-   ========================================================= */
 
-/* Tablet down */
+
 @media (max-width: 900px) {
-  /* panel sizing */
+
   .rp-modal--recipe.rp-modal__panel,
   .recipe-modal--simple.rp-modal__panel,
   .rp-modal .rp-modal__panel.rp-modal--recipe,
@@ -1154,12 +1140,12 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
     border-radius: 20px;
   }
 
-  /* banner/header */
+ 
   .rmodal__banner {
     padding: 10px 16px;
   }
 
-  /* content */
+ 
   .rp-modal__body.rmodal {
     padding: 16px 18px;
   }
@@ -1168,9 +1154,8 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 
 
 
-/* Phones */
 @media (max-width: 600px) {
-  /* make panel fill phone nicely and scroll inside */
+ 
   .rp-modal--recipe.rp-modal__panel,
   .recipe-modal--simple.rp-modal__panel,
   .rp-modal .rp-modal__panel.rp-modal--recipe,
@@ -1189,24 +1174,24 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   }
   .rp-modal__body.rmodal {
     padding: 14px 14px 16px;
-    max-height: calc(90svh - 44px); /* leave room for banner */
+    max-height: calc(90svh - 44px); 
     overflow: auto;
   }
 
-  /* headings & text */
+ 
   .rmodal__name { font-size: 20px; margin: 10px 0 8px; }
   .rmodal__label { font-size: 16px; margin: 12px 0 8px; }
 
-  /* ingredient chips/cards → single column, compact */
+  
   .rmodal__chips { gap: 10px; }
   .rmodal__chips--grid {
     display: grid;
-    grid-template-columns: 1fr;      /* one per row on phones */
+    grid-template-columns: 1fr;     
     gap: 10px;
   }
   .ing.ing--card {
     display: grid;
-    grid-template-columns: 48px 1fr; /* image + text */
+    grid-template-columns: 48px 1fr;
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
@@ -1218,11 +1203,11 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   .ing__name   { font-size: 14px; }
   .ing__measure{ font-size: 12.5px; opacity: .85; }
 
-  /* instructions list */
+
   .rmodal__steps { gap: 8px; }
   .rmodal__steps li { font-size: 14px; line-height: 1.55; }
 
-  /* youtube button (solo) */
+
   .rmodal__yt.rmodal__yt--solo {
     display: inline-flex;
     align-items: center;
@@ -1234,7 +1219,7 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
   }
 }
 
-/* Small phones */
+
 @media (max-width: 420px) {
   .rp-modal--recipe.rp-modal__panel,
   .recipe-modal--simple.rp-modal__panel,
@@ -1252,9 +1237,9 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
 }
 
 
-/* === Recipe Details modal: 2-per-row with vertical card layout on phones === */
+
 @media (max-width: 600px) {
-  /* keep two columns */
+
   .recipe-modal--simple .rmodal__chips--grid,
   .rp-modal--recipe .rmodal__chips--grid {
     display: grid;
@@ -1262,17 +1247,17 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
     gap: 12px;
   }
 
-  /* stack image (top) then text (bottom) */
+ 
   .recipe-modal--simple .ing.ing--card,
   .rp-modal--recipe .ing.ing--card {
-    display: flex !important;          /* override any grid row layout */
-    flex-direction: column !important; /* image above text */
+    display: flex !important;         
+    flex-direction: column !important; 
     align-items: center;
     text-align: center;
     gap: 8px;
     padding: 12px;
     border-radius: 12px;
-    min-height: 140px;                  /* consistent card height */
+    min-height: 140px;                 
   }
 
   .recipe-modal--simple .ing.ing--card img,
@@ -1295,13 +1280,3 @@ body.rp-noscroll{ position:fixed; overflow:hidden; width:100%; padding-right:var
     opacity: .85;
   }
 }
-
-/* optional: if it feels tight on ultra-small phones, drop to 1 per row */
-/*
-@media (max-width: 340px) {
-  .recipe-modal--simple .rmodal__chips--grid,
-  .rp-modal--recipe .rmodal__chips--grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-*/

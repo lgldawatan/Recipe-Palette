@@ -32,7 +32,7 @@ body {
   margin: 24px auto 56px;
 }
 
-/*footer appear only after scrolling on the Favorites page */
+
 .fav-wrap {
   min-height: calc(100svh - 110px);
   display: flex;
@@ -51,7 +51,7 @@ body {
   margin-top: auto;
 }
 
-/* Empty*/
+
 .favorites.is-empty {
   display: grid;
   place-items: center;
@@ -118,7 +118,7 @@ body.rp-noscroll {
   }
 }
 
-/* ===== Hover overlay===== */
+
 .recipe-card__overlay {
   position: absolute;
   inset: 0;

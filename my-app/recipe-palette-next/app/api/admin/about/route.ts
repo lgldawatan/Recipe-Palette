@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminDb } from "@/lib/firebaseAdmin";
 
-// Check if user is authenticated
+
 async function isAuthenticated() {
   const cookieStore = await cookies();
   const adminAuth = cookieStore.get("adminAuth");
   return !!adminAuth?.value;
 }
 
-// Default about content
+
 const DEFAULT_CONTENT = {
   aboutUsText: "At recipe palette., we believe cooking is more than just making meals. It's an art form. Like colors on a canvas, every ingredient adds depth, flavor, and creativity to your kitchen.",
   ourStoryText: "Recipe Palette was born from the love of food and the belief that every kitchen can be a place of creativity. We wanted to create a space where flavors come together, cultures meet, and everyday meals are transformed into vibrant experiences. Whether you're a beginner in the kitchen or a seasoned cook, our platform is designed to inspire, guide, and celebrate your journey.",
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     if (docSnap.exists) {
       return NextResponse.json(docSnap.data());
     } else {
-      // Initialize with default content if doesn't exist
+      
       await docRef.set(DEFAULT_CONTENT);
       return NextResponse.json(DEFAULT_CONTENT);
     }
@@ -69,7 +69,6 @@ export async function PUT(req: NextRequest) {
 
     console.log("Successfully saved about content to Firestore");
     
-    // Verify by reading back
     const savedDoc = await docRef.get();
     console.log("Verified - data in Firestore:", JSON.stringify(savedDoc.data(), null, 2));
     

@@ -24,7 +24,7 @@ export default function Signin() {
     return () => document.body.classList.remove("signin-view");
   }, []);
 
-  // if already signed in, skip this screen
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       if (u) navigate(next, { replace: true });
@@ -41,7 +41,7 @@ export default function Signin() {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      // Force account chooser so user can select which Google account to use
+      
       provider.setCustomParameters({ prompt: "select_account" });
       await signInWithPopup(auth, provider);
       navigate(next, { replace: true });
@@ -81,7 +81,7 @@ export default function Signin() {
           make every meal special with Recipe&nbsp;Palette. Your trusted
           kitchen companion for everyday inspiration.
         </p>
-        {/* Google CTA */}
+      
         <button
           type="button"
           className="google-cta"
@@ -97,7 +97,7 @@ export default function Signin() {
 
         {err && <div className="auth-error">{err}</div>}
 
-        {/* Back link */}
+      
         <div className="auth-back">
           <Link to="/" className="auth-back-link">Back to Home</Link>
         </div>
